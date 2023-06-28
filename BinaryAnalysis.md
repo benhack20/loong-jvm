@@ -1,16 +1,15 @@
 # 针对二进制可执行文件进行分析
 
 ## 基于硬件性能计数器的性能分析
+
 ### 基本原理
-硬件性能计数器（Hardware Performance Counters，简称 HPCs）是现代微处理器中被设计用于监测处理器行为的特殊电路结构。[^1]
 
-HPCs 通常是可编程的，以实现对不同的预定义性能事件（Performance Event）进行周期性采样。[^2]
+硬件性能计数器（Hardware Performance Counters，简称 HPCs）是一种普遍存在于现代微处理器内部（on-chip）的特殊寄存器。[^1]
 
-例如在微结构为  Sandy Bridge  的 Intel Core i7 处理器中，就存在名为性能监测单元（Performance Monitor Unit，简称 PMU）的硬件设施，其中包含 3 个可编程的 HPCs 组，每组包含 4 个可以监测并统计不同性能事件的 HPCs。[^3]
+HPCs 通常是可编程的，其主要用途是根据指定的性能事件（Performance Event）和采样周期，来记录处理器、操作系统以及应用程序的执行状况。其中，性能事件既包括在微结构层面定义的分支预测成功率、缓存命中率、指令周期、指令数量等硬件事件（Hardware Event），也包括在操作系统和应用层面定义的上下文切换、函数调用、非对齐访存、缺页错误等软件事件（Software Event）。[^2][^3]
 
-HPCs 所采集到的数据可以被用于分析处理器、操作系统以及应用程序的执行状况，进而
+基于 HPCs 的性能分析工具的工作过程如下：[^4]
 
-### 局限性
 ### 案例
 Oprofile、PAPI、VTune、Perf
 
@@ -26,6 +25,7 @@ Gprof、DynamoRIO、Valgrind、Pin
 
 ## 参考文献
 
-[^1]: V. M. Weaver, D. Terpstra and S. Moore, "Non-determinism and overcount on modern hardware performance counter implementations," 2013 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS), Austin, TX, USA, 2013, pp. 215-224, doi: 10.1109/ISPASS.2013.6557172.
-[^2]: D. Zaparanuks, M. Jovic and M. Hauswirth, "Accuracy of performance counter measurements," 2009 IEEE International Symposium on Performance Analysis of Systems and Software, Boston, MA, USA, 2009, pp. 23-32, doi: 10.1109/ISPASS.2009.4919635.
-[^3]: Intel 64 and IA-32 Architectures Software Developer’s Manual: Volume 3. https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-system-programming-manual-325384.html.
+[^1]: Weaver, Vincent M., Dan Terpstra, and Shirley Moore. "Non-determinism and overcount on modern hardware performance counter implementations." _2013 IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS)_. IEEE, 2013.
+[^2]: Khoshbakht, Saman, and Nikitas Dimopoulos. "A new approach to detecting execution phases using performance monitoring counters." _Architecture of Computing Systems-ARCS 2017: 30th International Conference, Vienna, Austria, April 3–6, 2017, Proceedings 30_. Springer International Publishing, 2017.
+[^3]: Yang, Yihao, et al. "Exploration and Exploitation of Hidden PMU Events." _arXiv preprint arXiv:2304.12072_ (2023).
+[^4]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
