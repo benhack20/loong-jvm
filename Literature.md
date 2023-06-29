@@ -88,3 +88,14 @@ C++和Java都有aspect-oriented extensions。也有框架使用AOP来支持对�
 - [Dynamic Software Metrics for Object Oriented Software: A Review](https://www.semanticscholar.org/paper/Dynamic-Software-Metrics-for-Object-Oriented-A-Gosain-Sharma/cd5fed2cd4f64fb72df82b1733eb7d82e13d5a3d)
   - 2015年，和survey作者相同。
   - 主要侧重metrics，之前那篇侧重tools和techniques。
+
+
+
+## 动态程序分析文献
+
+- Backes, M., Bugiel, S., Schranz, O., von Styp-Rekowsky, P., & Weisgerber, S. (2017, April). Artist: The android runtime instrumentation and security toolkit. In *2017 IEEE European Symposium on Security and Privacy (EuroS&P)* (pp. 481-495). IEEE.
+  - 2017年，介绍一种基于编译器的插桩技术，针对安卓。
+- M. Harman, & P. O'Hearn. (2018). From start-ups to scale-ups: Opportunities and open problems for static and dynamic program analysis. Paper presented at the *- 2018 IEEE 18th International Working Conference on Source Code Analysis and Manipulation (SCAM),* pp. 1-23. doi:10.1109/SCAM.2018.00009
+  - 2018年，关于如何将程序静态、动态分析的成功应用到工业界的主旨演讲。
+- ["dynamic program analysis" - Google 学术搜索](https://scholar.google.com/scholar?start=0&q="dynamic+program+analysis"&hl=zh-CN&scisbd=1&as_sdt=0,5)
+  - 待看
