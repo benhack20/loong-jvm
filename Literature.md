@@ -99,3 +99,47 @@ C++和Java都有aspect-oriented extensions。也有框架使用AOP来支持对�
   - 2018年，关于如何将程序静态、动态分析的成功应用到工业界的主旨演讲。
 - ["dynamic program analysis" - Google 学术搜索](https://scholar.google.com/scholar?start=0&q="dynamic+program+analysis"&hl=zh-CN&scisbd=1&as_sdt=0,5)
   - 待看
+
+
+
+
+
+## AOT vs. JIT: impact of profile data on code quality[^3]
+
+### JIT编译和AOT编译
+
+JIT编译可以在程序执行时动态地生成优化的本地代码，而AOT编译则是在软件安装时生成本地代码。然而，由于动态程序分析技术的使用，JIT编译优化更加适合动态程序分析，因为它可以利用当前运行时的profile数据来进行优化，而AOT编译则需要依赖于静态程序分析。 
+
+### HotSpot JVM实验
+
+使用了HotSpot JVM来进行实验，比较了AOT和JIT编译在不同profile数据下的性能表现。
+
+- profile数据对于JIT编译优化的性能有着显著的影响，而AOT编译则无法获得这种优势。
+- 即使只有很少的profile数据，也可以显著地提高生成的代码质量。
+
+### Profile数据的特性
+
+进一步探讨了profile数据的特性，以及如何最大化其对于PGO（Profile-Guided Optimization）的指导作用。
+
+作者发现，profile数据的特性需要足够准确，以适应当前程序输入。其他的一些问题：
+
+- 如何在无法进行在线分析的AOT系统中提取准确的profile数据，并根据不同的输入行为定制生成的二进制文件。
+
+- 是否可以将程序行为分类为有限的行为类型，是否可以改进离线分析中的profile数据收集，以覆盖所有可能的程序行为，以及是否可以构建高级静态分析技术来提高离线分析输入的覆盖范围。
+
+### 实现结果
+
+使用创新的VM框架来探究profile数据的特性。
+
+- 即使只有很少的profile数据，也可以显著提高生成的代码质量。
+- 此外，profile数据的准确性对于PGO的最大潜力的实现至关重要。即使有大量的profile数据，如果数据不准确，也会对优化过程产生负面影响。
+
+### 总结
+
+传统的JIT编译模型可以利用当前运行时的profile信息来指导优化过程，从而生成高质量的本地代码。相比之下，AOT编译在生成代码时无法利用动态运行时的信息，因此无法像JIT编译那样进行精细的优化。
+
+此外，profile数据的准确性对于优化过程的效果至关重要。即使有大量的profile数据，如果数据不准确，也会对优化过程产生负面影响。研究结果对于VM开发人员和研究人员构建综合利用AOT和JIT编译优势的编译系统具有重要的指导意义。
+
+
+
+[^3]: Wade, A. W., Kulkarni, P. A., & Jantz, M. R. (2017, June). AOT vs. JIT: impact of profile data on code quality. In *Proceedings of the 18th ACM SIGPLAN/SIGBED Conference on Languages, Compilers, and Tools for Embedded Systems* (pp. 1-10).
