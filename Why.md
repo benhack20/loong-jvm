@@ -1,13 +1,6 @@
 # Why
 
-    Why
-      为什么研究动态程序分析
-        静态程序分析的适用场景和局限性
-          o1 o2 o3 编译优化选项都做了什么
-          缺少运行时信息有什么问题
-        动态程序分析的适用场景和局限性
-          jit编译优化为什么更适合使用动态程序分析
-          额外开销 实现难度 优化难度 编译系统复杂性
+[TOC]
 
 ## 一、静态程序分析
 
@@ -161,13 +154,39 @@
 
 
 
-## 动态程序分析
+## 二、动态程序分析
 
 ### 1. JIT编译优化
+
+#### 概念
+
+- AOT：代码编译发生在程序执行前，即load-time编译。
+- JIT：代码编译发生在代码被运行时，可能编译所有或部分程序，即run-time编译[^10]。
+
+以Java为例，具体来说[^11]，Java程序由类组成，这些类包含平台无关的字节码，JVM可以在许多不同的计算机体系结构上解释执行这些字节码。在运行时，JVM加载类文件，确定每个单独字节码的语义，并执行适当的计算。解释过程中额外的CPU和内存使用意味着Java应用程序的执行速度比本地应用程序慢。JIT编译器通过在运行时将字节码编译成本机代码来帮助提高Java程序的性能。
+
+JIT编译器在默认情况下处于启用状态。当一个方法被编译后，JVM会直接调用该方法的编译代码，而不是对其进行解释执行。在实践中，方法不是在第一次调用时编译的。对于每个方法，JVM都会维护一个调用计数，该计数从预定义的编译阈值开始，每次调用该方法时都会递减。当调用计数达到零时，将触发该方法的JIT编译。因此，经常使用的方法是在JVM启动后不久编译的，而较少使用的方法则是在很久之后编译的，或者根本不编译。JIT编译阈值有助于提升性能的同时保证JVM快速启动。
+
+#### JIT编译为何适合动态程序分析
+
+由于动态编译的编译时间开销是在运行时而非运行前，因此需要谨慎地选择哪些方法需要编译以及什么时候编译它们。更具体地说，只有当编译所花费的额外时间可以被编译后代码获得的性能提升所补偿的时候，才可以选择对这个方法进行编译[^10]。这就要求动态地分析代码运行开销。
+
+由于需要加载和编译字节码，JIT编译造成了初始执行阶段的“启动延迟”。一个JIT编译器需要在启动延迟和优化程度之间做出权衡。Sun的HotSpot JVM结合了解释执行和JIT编译，程序最开始被解释执行，从而获得较快的启动速度，之后针对被频繁执行的部分进行JIT编译优化，提升程序性能。JIT编译又有两种模式：Client模式通过执行较少的编译优化来实现较低的启动延迟，Server模式进行了大量的编译和优化，牺牲了启动时间但最大化了运行后的程序性能。这种分层编译的选择机制需要用到动态程序分析[^12]。
+
+使用JIT编译时，虚拟机可以采集profile数据来理解和利用每次程序运行的行为，JIT编译器可以利用这些profile data来进行PGO（profile-guided optimization），从而为每一次程序的输入定制编译本地机器码，从而提升程序性能，并且还可以让虚拟机进行更为激进并可能不安全的投机式优化，这种编译优化后的代码可以在后续条件不满足时反编译回来[^6]。
+
+#### Profile数据的作用
+
+- 动态程序分析获得的Profile data可以被用来找到程序中被频繁执行的热点代码，这些信息可以被编译器用来聚焦于热码的编译和优化，比如很多java虚拟机使用选择编译，即只编译和优化热点代码，从而减小JIT的运行时开销[^7]。
+- Profile数据还可以用来随机化、多样化冷代码（不常被执行的代码）来减小开销[^7]、提升JVM的代码缓存管理[^8]、在垃圾回收阶段提升堆数据的局部性[^9]等。
 
 
 
 ### 2. 动态程序分析的局限性
+
+- 相比于静态程序分析，动态分析需要程序运行起来，增加了额外的运行时开销。同时，用于动态程序分析的插桩等操作也可能对程序的性能造成影响。
+- 动态程序分析只对特定的运行有效，这既是它的优点（可以确保该执行路径是可达的），也造成了它无法适用于所有情况的局限性。
+- 使用动态分析的编译系统设计和实现更加复杂，比如JIT编译的分层体系相比于AOT编译（一次编译，不再改变）更加复杂。
 
 
 
@@ -180,3 +199,10 @@
 [^3]: Kozen, D. C. (2006). *Theory of computation* (Vol. 170). Heidelberg: Springer.
 [^4]: Ball, T. (1999). The concept of dynamic analysis. *ACM SIGSOFT Software Engineering Notes*, *24*(6), 216-234.
 [^5]: Gosain, A., & Sharma, G. (2015). A survey of dynamic program analysis techniques and tools. In *Proceedings of the 3rd International Conference on Frontiers of Intelligent Computing: Theory and Applications (FICTA) 2014: Volume 1* (pp. 113-122). Springer International Publishing.
+[^6]: Wade, A. W., Kulkarni, P. A., & Jantz, M. R. (2017, June). AOT vs. JIT: impact of profile data on code quality. In *Proceedings of the 18th ACM SIGPLAN/SIGBED Conference on Languages, Compilers, and Tools for Embedded Systems* (pp. 1-10). 
+[^7]: Homescu, A., Neisius, S., Larsen, P., Brunthaler, S., & Franz, M. (2013, February). Profile-guided automated software diversity. In *Proceedings of the 2013 IEEE/ACM International Symposium on Code Generation and Optimization (CGO)* (pp. 1-11). IEEE.
+[^8]: Robinson, F. J., Jantz, M. R., & Kulkarni, P. A. (2016). Code cache management in managed language VMs to reduce memory consumption for embedded systems. *ACM SIGPLAN Notices*, *51*(5), 11-20.
+[^9]: Huang, X., Blackburn, S. M., McKinley, K. S., Moss, J. E. B., Wang, Z., & Cheng, P. (2004). The garbage collection advantage: Improving program locality. *ACM SIGPLAN Notices*, *39*(10), 69-80.
+[^10]: Suganuma, T., Yasue, T., Kawahito, M., Komatsu, H., & Nakatani, T. (2001). A dynamic optimization framework for a Java just-in-time compiler. *ACM SIGPLAN Notices*, *36*(11), 180-195.
+[^11]: *The JIT Compiler.* Retrieved July, 2023, from [The JIT compiler - IBM Documentation](https://www.ibm.com/docs/en/sdk-java-technology/8?topic=reference-jit-compiler)
+[^12]: *The Java HotSpot Performance Engine Architecture.* Retrieved July, 2023, from [The Java HotSpot Performance Engine Architecture (oracle.com)](https://www.oracle.com/java/technologies/whitepaper.html)
