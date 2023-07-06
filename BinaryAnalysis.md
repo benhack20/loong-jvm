@@ -34,27 +34,41 @@
 <p>图2 内核子系统 perf_events 的结构示意图</p>
 </div>
 
-尽管相比于直接访问 PMU 甚至 PMC 的方法而言，使用 perf_events 进行性能分析会带来额外的监测开销（Measurement Overhead）[^20]。但在用户空间直接操作性能计数器，可能面临更高的安全风险。此外，将性能计数器的相关基础设施构建在内核中，还可以有效监测内核的运行时数据，从而实现更细粒度的性能事件分类[^21]。
+尽管相比于直接访问 PMU 甚至 PMC 的方法，使用 perf_events 进行性能分析会带来额外的监测开销（Measurement Overhead）[^20]。但在用户空间直接操作性能计数器，可能面临更高的安全风险。此外，将性能计数器的相关基础设施构建在内核中，还可以有效监测内核的运行时数据，从而实现更细粒度的性能事件分类[^21]。
 
-在 perf_events 的初始化阶段，会将当前系统支持的性能事件按照类别抽象成设备（Device）进行管理。通过 `tree /sys/bus/event_source/devices/` 可查看已挂载的事件源（Event Source）设备，每个事件源对应一类性能事件，具体内容取决于硬件规格和内核版本，但至少应该包含如下类别：
+在 perf_events 的初始化阶段，当前系统支持的性能事件会被根据类别抽象成不同的设备（Device）进行管理。可通过 `tree /sys/bus/event_source/devices/` 查看已挂载的事件源（Event Source）设备，每个事件源对应一类性能事件，具体内容取决于硬件规格和内核版本，但至少应该包含如下类别：
 
 * cpu：基于硬件性能计数器统计的 CPU 相关性能事件，如缓存命中、分支预测等。
 * software：基于软件性能计数器统计的底层（low-level）软件事件，如上下文切换、页错误等。
 * tracepoint：用于跟踪和监测内核中的特定功能的事件，如系统调用、中断请求等。
-* kprobe：自定义的内核动态追踪事件。
-* uprobe：自定义的用户级别动态追踪事件。
+* kprobe：通过 Kernel Probes Frameworks 自定义的内核动态追踪事件。
+* uprobe：通过 User-Space Probes Frameworks 自定义的用户空间动态追踪事件。
 
-其中，tracepoint 事件是基于静态分析的跟踪技术（Static Tracing）的一种具体实现方式，通过预先在内核源码中硬编码（hardcoded）插桩，即可根据在运行时收集的数据对内核进行调试和性能分析[^22]。而 kprobe 事件和 uprobe 事件都属于基于动态分析的跟踪技术（Dynamic Tracing），可以在运行时通过动态插桩并注册对应的性能事件来实现性能监测[^23]。
+其中，tracepoint 事件是基于静态分析的跟踪技术（Static Tracing）的一种具体实现方式，通过在内核源码中静态插桩（Static Instrumentation）来收集用于性能分析的运行时数据[^22]。而 kprobe 事件和 uprobe 事件则都属于基于动态分析的跟踪技术（Dynamic Tracing）的具体实现方式，可通过动态插桩（Dynamic Instrumentation）并注册对应的性能事件来实现性能监测[^23]。
 
 ### 基于性能计数器的性能分析工具
 
-perf 工具是基于 perf_events 接口开发的用户空间工具，它利用这个接口来与内核进行交互和收集性能数据。使用 perf 工具，用户可以选择不同的事件（如指令执行、缓存命中等）来监测系统的性能，并通过 perf 命令进行控制和收集数据。
+伴随 perf_events 子系统共同合入内核主线的 perf 工具[^18]，经过十余年的迭代演进，目前已经被广泛应用于程序分析、系统调优、性能测试等场景，是 Linux 软件生态中重要的性能分析工具（Profiler）之一[^21]。作为一款基于性能计数器的性能分析工具，perf 的核心业务逻辑是通过对性能计数器进行维护和管理，实现在运行时统计被监测的性能事件的触发情况，并根据计数或采样数据提供分析结果。
 
-perf 具有计数模式（Aggregate）、采样模式（Sampled）、追踪模式（Self-monitoring）等。相比于之前的性能分析工具，
+<div align="center">
+<img src="https://www.oss.kr/files/attach/images/654916/575/667/db587d4835d8ed965d17099f8209b75d.png"/>
+<p>图3 性能分析工具 perf 的设计结构</p>
+</div>
 
-典型的基于性能计数器的性能分析工具 perf stat 的工作过程如图 2 所示。
+perf 是一个跨越用户空间、系统内核和硬件层级的工具[^18]，其整体设计结构如图 3 所示。perf 的核心业务逻辑的实现依赖于内核中的 perf_events 子系统对软件性能计数器和硬件性能计数器的管理，以及服务于性能计数器的事件分派、计数控制、结果缓存等功能[^19]。涉及硬件性能事件的数据需要从 PMU 中获取，而像 tracepoint、kprobes 等基于软件性能计数器的事件则完全在内核中处理。用户空间与内核的数据交互通过内存映射（mmap）实现，在用户空间中使用 perf commands 可以控制性能事件数据的采集和处理方式，包括计数（perf stat）、采样（perf record）、追踪（perf trace）等[^18]。
 
-但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，需要监听的硬件事件数量过多则需要配置复用[^30]，此外，不容易保证多线程读写同步，而且分析 MPI 程序非常困难，may not be programmable or readable from user-level code, and can not discriminate between events caused by different software threads. Various software infrastructures address this problem, providing access to per-thread counters from application code. However, such infrastructures incur a cost: the software instructions executed to access a counter, or to maintain a per-thread counter, may perturb that same counter. While this perturbation is presumably small, its significance depends on the specific measurement: it may be irrelevant for a marathon-length measurement, but it could significantly perturb the measurement of a sprint.[^29]
+<div align="center">
+<img src="https://shaojiemike.oss-cn-hangzhou.aliyuncs.com/img/20220801152818.png"/>
+<p>图4 性能分析工具 perf 的核心功能调用逻辑</p>
+</div>
+
+尽管实现复杂，但由于良好的抽象设计，仅仅使用 `sys_perf_event_open()` 系统调用就可以实现对性能事件的监听，
+
+典型的基于性能计数器的性能分析工具 perf 的工作过程如图 4 所示
+
+但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，需要监听的硬件事件数量过多则需要配置复用[^30]，此外，不容易保证多线程读写同步，而且分析 MPI 程序非常困难。计数器多路复用、线程上下文切换保存计数器等必要功能都会带来额外的测量开销，perf工具的测量开销是客观存在的，尽管针对大型程序来说，这种开销可能微不足道，但这也可能影响小型程序的性能分析结果[^29]
+
+局限：PMU 没有定义的、操作系统也无法收集的数据，就无法通过基于性能计数器的性能分析工具收集。例如指令的逐条分类统计。
 
 ## 基于模拟器的性能分析
 
