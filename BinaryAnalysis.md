@@ -34,7 +34,7 @@
 <p>图2 内核子系统 perf_events 的结构示意图</p>
 </div>
 
-尽管相比于直接访问 PMU 甚至 PMC 的方法，使用 perf_events 进行性能分析会带来额外的监测开销（Measurement Overhead）[^20]。但在用户空间直接操作性能计数器，可能面临更高的安全风险。此外，将性能计数器的相关基础设施构建在内核中，还可以有效监测内核的运行时数据，从而实现更细粒度的性能事件分类[^21]。
+尽管相比于直接访问 PMU 甚至 PMC 的方法，使用 perf_events 进行性能分析会带来额外的监测开销（Measurement Overhead）[^19]。但在用户空间直接操作性能计数器，可能面临更高的安全风险[^20]。此外，将性能计数器的相关基础设施构建在内核中，还可以有效监测内核的运行时数据，从而实现更细粒度的性能事件分类[^21]。
 
 在 perf_events 的初始化阶段，当前系统支持的性能事件会被根据类别抽象成不同的设备（Device）进行管理。可通过 `tree /sys/bus/event_source/devices/` 查看已挂载的事件源（Event Source）设备，每个事件源对应一类性能事件，具体内容取决于硬件规格和内核版本，但至少应该包含如下类别：
 
@@ -48,27 +48,38 @@
 
 ### 基于性能计数器的性能分析工具
 
-伴随 perf_events 子系统共同合入内核主线的 perf 工具[^18]，经过十余年的迭代演进，目前已经被广泛应用于程序分析、系统调优、性能测试等场景，是 Linux 软件生态中重要的性能分析工具（Profiler）之一[^21]。作为一款基于性能计数器的性能分析工具，perf 的核心业务逻辑是通过对性能计数器进行维护和管理，实现在运行时统计被监测的性能事件的触发情况，并根据计数或采样数据提供分析结果。
+伴随 perf_events 子系统共同合入内核主线的 perf 工具[^18]，经过十余年的迭代演进，目前已经被广泛应用于程序分析、系统调优、性能测试等场景，是 Linux 软件生态中重要的性能分析工具（Profiler）之一[^21]。作为一款基于性能计数器的性能分析工具，perf 的核心业务逻辑是通过对性能计数器进行维护和管理，实现在运行时统计被监测的性能事件的触发情况，并根据收集的计数或采样数据生成分析结果[^19]。
 
 <div align="center">
 <img src="https://www.oss.kr/files/attach/images/654916/575/667/db587d4835d8ed965d17099f8209b75d.png"/>
 <p>图3 性能分析工具 perf 的设计结构</p>
 </div>
 
-perf 是一个跨越用户空间、系统内核和硬件层级的工具[^18]，其整体设计结构如图 3 所示。perf 的核心业务逻辑的实现依赖于内核中的 perf_events 子系统对软件性能计数器和硬件性能计数器的管理，以及服务于性能计数器的事件分派、计数控制、结果缓存等功能[^19]。涉及硬件性能事件的数据需要从 PMU 中获取，而像 tracepoint、kprobes 等基于软件性能计数器的事件则完全在内核中处理。用户空间与内核的数据交互通过内存映射（mmap）实现，在用户空间中使用 perf commands 可以控制性能事件数据的采集和处理方式，包括计数（perf stat）、采样（perf record）、追踪（perf trace）等[^18]。
+perf 的实现涉及用户空间、系统内核、硬件三个层级，其整体设计结构如图 3 所示。在用户空间中，通过 perf commands 可以选择要监测的性能事件，并设置数据的采集和分析方式[^24]。在内核中，perf_events 负责维护 tracepoint、kprobes 等基于软件性能计数器的性能事件的数据，同时不断地从 PMU 中获取硬件性能事件的计数值，并根据采样（sample）的精度需求，保存性能事件触发时刻的上下文信息[^19]。此外，为了实现用户空间和内核空间的数据交互，perf_events 还会为每个被监测的 CPU 或线程（仅 per-thread 模式）维护一个用于存储运行时性能数据的环形缓冲区（ring buffer）[^25]。用户空间的应用可通过内存映射（mmap）的方式访问内核中缓存的性能数据，以满足计数（perf stat）、采样（perf record）、追踪（perf trace）等功能的数据需求[^18]。
+
+此外，perf 还允许在指定性能事件时额外添加事件修饰符（Event Modifiers），以实现对性能事件更细致的配置和限制。常用事件修饰符对应的功能如下：
+
+* u 仅统计在用户空间中触发的性能事件
+* k 仅统计在内核中触发的性能事件
+* p 控制性能事件发生时刻，获取的指令地址的精度级别
+
+以 `perf record -e cycles:u -c 1000` 的工作过程为例，其核心功能的调用逻辑如图 4 所示。在初始化阶段，系统调用 `sys_perf_event_open()` 负责将 PMC 配置为用于记录用户空间的指令周期数，并通过 `mmap()` 将内核中的环形缓冲区（ring buffer）映射到 perf commands 可访问的内存地址[^25]。在执行阶段，当 PMC 的计数值达到设定的采样阈值（`-c 1000`）时，PMU 会生成一个性能监视中断（Performance Monitoring Interrupt，简称 PMI）以提示 PMC 溢出[^27]。内核会捕获 PMI 中断请求（Interrupt Request，简称 IRQ）并交由 perf_events 解析当前时刻（timestamp）的 CPU 现场[^19]。指令地址、线程号、函数名等上下文信息将在解析完成后被写入环形缓冲区，随后 PMC 的值将被重置以准备执行下一轮采样[^26]。
 
 <div align="center">
 <img src="https://shaojiemike.oss-cn-hangzhou.aliyuncs.com/img/20220801152818.png"/>
-<p>图4 性能分析工具 perf 的核心功能调用逻辑</p>
+<p>图4 perf 的核心功能调用逻辑</p>
 </div>
 
-尽管实现复杂，但由于良好的抽象设计，仅仅使用 `sys_perf_event_open()` 系统调用就可以实现对性能事件的监听，
+然而，现代处理器通常使用多发射、超标量、深流水等技术来提升整体性能，这些技术的应用也使得对性能事件（特别是硬件性能事件）进行准确采样变得更加困难。在上述例子中，上下文信息通过解析中断处理时刻保存的 CPU 现场（PC、通用寄存器、堆栈指针等）而获得，但深流水线机制可能导致中断处理时获取的 CPU 现场信息与中断发生时刻的现场信息存在一定的偏差。如果偏离程度过大，采样的上下文将不够精确，例如方法名就可能出现偏差。虽然处理器设计者会采取一些措施来尽量减小这种差异，如清空流水线、提供专门的中断处理机制等，但无法完全消除偏差的可能性。
 
-典型的基于性能计数器的性能分析工具 perf 的工作过程如图 4 所示
+为了解决这个问题，Intel 和 AMD 处理器分别通过 PEBS 和 IBS 机制实现了高精度事件采样。二者的核心原理都是通过硬件在计数器溢出时将处理器现场直接保存到内存，而不是在响应中断时才保存寄存器现场，提高了采样精度。在默认条件下，perf 不使用 PEBS 机制。用户如果想要使用高精度采样，需要在指定性能事件时，在事件名后添加后缀”:p”或”:pp”。Perf在采样精度上定义了4个级别，级别描述如下。
 
-但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，需要监听的硬件事件数量过多则需要配置复用[^30]，此外，不容易保证多线程读写同步，而且分析 MPI 程序非常困难。计数器多路复用、线程上下文切换保存计数器等必要功能都会带来额外的测量开销，perf工具的测量开销是客观存在的，尽管针对大型程序来说，这种开销可能微不足道，但这也可能影响小型程序的性能分析结果[^29]
+* 0 无精度保证  
+* 1 采样指令与触发性能事件的指令之间的偏差为常数（:p）
+* 2 需要尽量保证采样指令与触发性能事件的指令之间的偏差为 0（:pp）
+* 3 保证采样指令与触发性能事件的指令之间的偏差必须为 0（:ppp）
 
-局限：PMU 没有定义的、操作系统也无法收集的数据，就无法通过基于性能计数器的性能分析工具收集。例如指令的逐条分类统计。
+### 优势与局限
 
 ## 基于模拟器的性能分析
 
@@ -105,10 +116,14 @@ Gprof、DynamoRIO、Valgrind、Pin
 [^17]: ARM, A. "Cortex®-a72 mpcore processor technical reference manual (revision r0p3)."
 [^18]: T. Gleixner and I. Molnar, "Performance counters for Linux", 2009.
 [^19]: Weaver, Vincent M. "Linux perf_event features and overhead." _The 2nd international workshop on performance analysis of workload optimized systems, FastPath_. Vol. 13. 2013.
-[^20]: Weaver, Vincent M. "Linux perf_event features and overhead." _The 2nd international workshop on performance analysis of workload optimized systems, FastPath_. Vol. 13. 2013.
+[^20]: Carelli, Alberto, Alessandro Vallero, and Stefano Di Carlo. "Performance Monitor Counters: interplay between safety and security in complex Cyber-Physical Systems." _IEEE Transactions on Device and Materials Reliability_ 19.1 (2019): 73-83.
 [^21]: Gregg, Brendan. "Linux Performance Analysis New Tools and Old Secrets." _Usenix Lisa 2014 conference_. 2014.
 [^22]: Giraldeau, Francis, et al. "Recovering system metrics from kernel trace." _Linux Symposium_. Vol. 109. 2011.
 [^23]: Rostedt, Steven, and Red Hat. "Ftrace kernel hooks: more than just tracing." _Linux Plumbers Conference_. 2014.
+[^24]: "Perf_events tutorial", 2012, [online] Available: http://perf.wiki.kemel.org/.
+[^25]: "Diving into Linux Perf Ring Buffer", 2021, [online] Available: https://people.linaro.org/~leo.yan/debug/perf/Diving_into_Linux_Perf_Ring_Buffer.pdf.
+[^26]: Akiyama, Soramichi, and Takahiro Hirofuchi. "Quantitative evaluation of intel pebs overhead for online system-noise analysis." _Proceedings of the 7th International Workshop on Runtime and Operating Systems for Supercomputers ROSS 2017_. 2017.
+[^27]: Sprunt, Brinkley. "Pentium 4 performance-monitoring features." _Ieee Micro_ 22.04 (2002): 72-82.
 
 [^29]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
 [^30]: V. Salapura, K. Ganesan, A. Gara, M. Gscwind, J. Sexton and R. Walkup, "Next-generation performance counters: Towards monitoring over thousand concurrent events", _Proc. IEEE International Symposium on Performance Analysis of Systems and Software_, pp. 139-146, Apr. 2008.
