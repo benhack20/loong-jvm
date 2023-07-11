@@ -53,6 +53,48 @@ CGLIB（Code Generation Library）是一个代码生成库，用于在运行时�
 
 
 
+## 二、动态二进制插桩
+
+动态二进制插桩（DBI）在程序运行时执行反汇编、分析和代码转换，具有这些优势[^21]：
+
+- 不需要像静态二进制插桩（SBI）一样需要区分内容中的代码和数据。
+- 不需要源码和补充信息就能覆盖全部代码。
+- 不需要更改程序的二进制码。
+
+一个标准的DBI工具包括[^21]：a. JIT编译器（用于反汇编、优化、插桩、重组装代码）。b. code cache来存储需要重新运行的插桩代码。 
+
+下面探索几种常见的动态二进制插桩工具。
+
+### PIN
+
+Pin是IA-32、x86-64和MIC指令集体系结构的动态二进制插桩框架，可用于创建动态程序分析工具。使用Pin构建的一些工具是Intel VTune、Intel Inspector、Intel Advisor和Intel SDE。使用Pin创建的工具称为Pintools，可用于对Linux、Windows和macOS上的用户空间应用程序执行程序分析。作为一种动态二进制检测工具，检测是在运行时对已编译的二进制文件执行的。因此，它不需要重新编译源代码，并且可以支持检测动态生成代码的程序[^22]。
+
+PIN3.28官网教程可以参考[^23]。
+
+一些中文程[^24][^25]。
+
+
+
+### DynamoRIO
+
+DynamoRIO是一个运行时代码操控系统，在程序执行时支持程序任何部分的代码转换。DynamoRIO导出了一个用于构建各种用途的动态工具的接口：程序分析和理解、Profile分析、插桩、优化、翻译等。与许多动态工具系统不同，DynamoRIO并不局限于插入callouts / trampolines，并且支持IA-32/AMD64/ARM/AArch64指令操作库对应用程序指令进行任意修改，支持Windows、Linux或Android[^26]。
+
+官方仓库参考[^27]。官网教程可以参考[^28]。
+
+一些中文教程[^29][^30]。
+
+
+
+### Valgrind
+
+Valgrind是一个用于构建动态分析工具的工具框架。Valgrind工具可以自动检测许多内存管理和线程错误，并提供程序的详细profile。也可以使用Valgrind来构建新的工具。Valgrind发行版目前包括七个工具：内存错误检测器、线程错误检测器、一个缓存和分支预测profiler等。
+
+官网用户手册参考[^31]。
+
+一些中文教程[^32][^33]。
+
+
+
 [^1]: [深入理解Java动态代理 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/347141071)
 [^2]: [什么？你还不知道字节码插桩！ - 掘金 (juejin.cn)](https://juejin.cn/post/6977571720215396366)
 [^3]: [字节码操纵技术探秘_Java_Victor Grazi_InfoQ精选文章](https://www.infoq.cn/article/Living-Matrix-Bytecode-Manipulation)
@@ -73,3 +115,16 @@ CGLIB（Code Generation Library）是一个代码生成库，用于在运行时�
 [^18]: [CGLib: The Missing Manual - DZone](https://dzone.com/articles/cglib-missing-manual)
 [^19]: [cglib 入门前篇 - 掘金 (juejin.cn)](https://juejin.cn/post/6889429768039890958)
 [^20]: [cglib入门后篇 - 掘金 (juejin.cn)](https://juejin.cn/post/6893462192953491469)
+[^21]: Priyadarshan, S. (2019). A study of Binary Instrumentation techniques.
+[^22]: [Pin - A Dynamic Binary Instrumentation Tool (intel.com)](https://www.intel.com/content/www/us/en/developer/articles/tool/pin-a-dynamic-binary-instrumentation-tool.html)
+[^23]: [Pin: Pin 3.28 User Guide (intel.com)](https://software.intel.com/sites/landingpage/pintool/docs/98749/Pin/doc/html/index.html)
+[^24]: [Pin 学习参考手册 (seebug.org)](https://paper.seebug.org/1742/)
+[^25]: [(109条消息) Intel pin小小小例子_pin例子_无名氏a的博客-CSDN博客](https://blog.csdn.net/shanlijia/article/details/107047507)
+[^26]: [Home (dynamorio.org)](https://dynamorio.org/)
+[^27]: [DynamoRIO/dynamorio: Dynamic Instrumentation Tool Platform (github.com)](https://github.com/DynamoRIO/dynamorio)
+[^28]: [Tutorials (dynamorio.org)](https://dynamorio.org/page_tutorials.html)
+[^29]: [深入浅出——基于DynamoRIO的strace和ltrace-安全客 - 安全资讯平台 (anquanke.com)](https://www.anquanke.com/post/id/169257)
+[^30]: [cbwang505/DIYDynamoRIO - 码云 - 开源中国 (gitee.com)](https://gitee.com/cbwang505/diydynamorio)
+[^31]: [Valgrind User Manual](https://valgrind.org/docs/manual/manual.html)
+[^32]: [valgrind检测内存泄漏、越界访问、野指针访问实验_千册的博客-CSDN博客](https://blog.csdn.net/yueni_zhao/article/details/131493762)
+[^33]: [valgrind基本功能介绍、基础使用方法说明_HNU Latecomer的博客-CSDN博客](https://blog.csdn.net/weixin_45518728/article/details/119865117)
