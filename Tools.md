@@ -95,6 +95,24 @@ Valgrind是一个用于构建动态分析工具的工具框架。Valgrind工具�
 
 
 
+## 三、虚拟机Profile
+
+JVM Tool Interface（JVMTI）[^34]是开发和监控工具使用的编程接口。它提供了一种检查状态和控制在Java虚拟机（VM）中运行的应用程序执行的方法。
+
+JVM TI旨在为需要访问VM状态的所有工具提供VM接口，包括但不限于：profile、调试、监视、线程分析和覆盖率分析工具。可能不是在Java虚拟机的所有实现中都可用。
+
+JVM TI是一个双向接口。JVM TI的客户端（以下称为agent）可以通过events通知感兴趣的事件。JVMTI可以通过许多functions查询和控制应用程序，这些函数要么响应事件，要么独立于事件。
+
+agents与执行被检查的应用程序的虚拟机在同一进程中运行并直接通信。这种通信是通过本机接口（JVM TI）进行的。通常，agents相对集中，它们可以由一个单独的进程控制，该进程在不干扰目标应用程序正常执行的情况下实现工具的大部分功能。
+
+英文教程[^35][^38]。
+
+一些中文教程[^36][^37]。
+
+
+
+
+
 [^1]: [深入理解Java动态代理 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/347141071)
 [^2]: [什么？你还不知道字节码插桩！ - 掘金 (juejin.cn)](https://juejin.cn/post/6977571720215396366)
 [^3]: [字节码操纵技术探秘_Java_Victor Grazi_InfoQ精选文章](https://www.infoq.cn/article/Living-Matrix-Bytecode-Manipulation)
@@ -128,3 +146,8 @@ Valgrind是一个用于构建动态分析工具的工具框架。Valgrind工具�
 [^31]: [Valgrind User Manual](https://valgrind.org/docs/manual/manual.html)
 [^32]: [valgrind检测内存泄漏、越界访问、野指针访问实验_千册的博客-CSDN博客](https://blog.csdn.net/yueni_zhao/article/details/131493762)
 [^33]: [valgrind基本功能介绍、基础使用方法说明_HNU Latecomer的博客-CSDN博客](https://blog.csdn.net/weixin_45518728/article/details/119865117)
+[^34]: [JVM(TM) Tool Interface 1.2.3 (oracle.com)](https://docs.oracle.com/javase/8/docs/platform/jvmti/jvmti.html)
+[^35]: [Creating a Debugging and Profiling Agent with JVMTI (oracle.com)](https://www.oracle.com/technical-resources/articles/javase/jvmti.html)
+[^36]: [基于JVMTI 实现性能监控 - 掘金 (juejin.cn)](https://juejin.cn/post/6942782366993612813)
+[^37]: [Java JVMTI和Instrumention机制介绍_instrumentation机制_疯狂哈丘的博客-CSDN博客](https://blog.csdn.net/u013332124/article/details/88367630)
+[^38]: [Building a Super Simple JVMTI Agent - Saurabh Badhwar](https://saurabhbadhwar.xyz/blog/2019/02/18/building-super-simple-jvmti-agent/)
