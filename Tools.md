@@ -111,6 +111,21 @@ agents与执行被检查的应用程序的虚拟机在同一进程中运行并�
 
 
 
+### 四、AOP编程
+
+AOP（Aspect-Oriented Programming）是一种编程范式，它通过将横切关注点（cross-cutting concern）从主要业务逻辑中分离出来，实现了代码的模块化和复用。在动态程序分析中，AOP有着广泛的应用。
+
+1. 日志记录：通过AOP定义一个日志切面（Logging Aspect），并将其应用到系统的各个关键点，如方法调用或异常处理，减少代码的重复性，提高代码的可读性和可维护性。
+2. 安全检查：通过AOP定义一个安全检查切面（Security Checking Aspect），并将其应用到敏感操作或关键方法上，集中管理安全检查的逻辑，并减少代码中的冗余安全检查代码。
+3. 性能监控：通过AOP定义一个性能监控切面（Performance Monitoring Aspect），并将其应用到需要监控的方法或代码段上，收集并分析程序的性能数据，帮助开发人员优化程序的性能。
+4. 异常处理：通过AOP定义一个异常处理切面（Exception Handling Aspect），并将其应用到需要处理异常的方法或代码段上，集中管理异常处理逻辑，并提高代码的健壮性和可靠性。
+
+常见的AOP工具在此处有详细的介绍[^39]。主要分析了APT，Javassist，AspectJ。前文提到的java字节码插桩工具基本都使用了AOP编程的思想。
+
+此外，在Spring框架中也有AOP特性，SpringAOP在[^40][^41]中有详细的介绍。
+
+
+
 
 
 [^1]: [深入理解Java动态代理 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/347141071)
@@ -151,3 +166,6 @@ agents与执行被检查的应用程序的虚拟机在同一进程中运行并�
 [^36]: [基于JVMTI 实现性能监控 - 掘金 (juejin.cn)](https://juejin.cn/post/6942782366993612813)
 [^37]: [Java JVMTI和Instrumention机制介绍_instrumentation机制_疯狂哈丘的博客-CSDN博客](https://blog.csdn.net/u013332124/article/details/88367630)
 [^38]: [Building a Super Simple JVMTI Agent - Saurabh Badhwar](https://saurabhbadhwar.xyz/blog/2019/02/18/building-super-simple-jvmti-agent/)
+[^39]: [一文读懂 AOP | 你想要的最全面 AOP 方法探讨 - 掘金 (juejin.cn)](https://juejin.cn/post/6844903728525361165)
+[^40]: [Spring AOP——Spring 中面向切面编程 - SharpCJ - 博客园 (cnblogs.com)](https://www.cnblogs.com/joy99/p/10941543.html)
+[^41]: [Aspect Oriented Programming with Spring](https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/aop.html)
