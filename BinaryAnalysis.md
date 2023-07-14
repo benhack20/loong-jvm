@@ -59,37 +59,50 @@ perf 的实现涉及用户空间、系统内核、硬件三个层级，其整体
 
 此外，perf 还允许在指定性能事件时额外添加事件修饰符（Event Modifiers），以实现对性能事件更细致的配置和限制。常用事件修饰符对应的功能如下：
 
-* u 仅统计在用户空间中触发的性能事件
-* k 仅统计在内核中触发的性能事件
-* p 控制性能事件发生时刻，获取的指令地址的精度级别
+* u - 仅统计在用户空间中触发的性能事件
+* k - 仅统计在内核中触发的性能事件
+* p - 控制性能事件采样的精度级别
 
-以 `perf record -e cycles:u -c 1000` 的工作过程为例，其核心功能的调用逻辑如图 4 所示。在初始化阶段，系统调用 `sys_perf_event_open()` 负责将 PMC 配置为用于记录用户空间的指令周期数，并通过 `mmap()` 将内核中的环形缓冲区（ring buffer）映射到 perf commands 可访问的内存地址[^25]。在执行阶段，当 PMC 的计数值达到设定的采样阈值（`-c 1000`）时，PMU 会生成一个性能监视中断（Performance Monitoring Interrupt，简称 PMI）以提示 PMC 溢出[^27]。内核会捕获 PMI 中断请求（Interrupt Request，简称 IRQ）并交由 perf_events 解析当前时刻（timestamp）的 CPU 现场[^19]。指令地址、线程号、函数名等上下文信息将在解析完成后被写入环形缓冲区，随后 PMC 的值将被重置以准备执行下一轮采样[^26]。
+现代微处理器普遍基于超标量（superscalar）、深流水（superpipelined）、乱序执行（out-of-order）等技术来提升整体性能[^25]，但复杂的微结构设计也增加了获取精确采样结果的难度[^26]。以 `perf record -e cycles:u -c 1000` 的工作过程为例，其核心功能的调用逻辑如图 4 所示。
 
 <div align="center">
 <img src="https://shaojiemike.oss-cn-hangzhou.aliyuncs.com/img/20220801152818.png"/>
 <p>图4 perf 的核心功能调用逻辑</p>
 </div>
 
-然而，现代处理器通常使用多发射、超标量、深流水等技术来提升整体性能，这些技术的应用也使得对性能事件（特别是硬件性能事件）进行准确采样变得更加困难。在上述例子中，上下文信息通过解析中断处理时刻保存的 CPU 现场（PC、通用寄存器、堆栈指针等）而获得，但深流水线机制可能导致中断处理时获取的 CPU 现场信息与中断发生时刻的现场信息存在一定的偏差。如果偏离程度过大，采样的上下文将不够精确，例如方法名就可能出现偏差。虽然处理器设计者会采取一些措施来尽量减小这种差异，如清空流水线、提供专门的中断处理机制等，但无法完全消除偏差的可能性。
+在初始化阶段，系统调用 `sys_perf_event_open()` 负责将 PMC 配置为用于记录用户空间的指令周期数，并通过 `mmap()` 将内核中的环形缓冲区（ring buffer）映射到 perf commands 可访问的内存地址[^27]。在执行阶段，当 PMC 的计数值达到设定的采样阈值（`-c 1000`）时，PMU 会生成一个性能监视中断（Performance Monitoring Interrupt，简称 PMI）以提示 PMC 溢出[^28]。内核会捕获 PMI 中断请求（Interrupt Request，简称 IRQ）并交由 perf_events 解析 CPU 现场[^19]。指令地址、线程号、函数名等上下文信息将在解析完成后被写入环形缓冲区，随后 PMC 的值将被重置以准备执行下一轮采样[^29]。
 
-为了解决这个问题，Intel 和 AMD 处理器分别通过 PEBS 和 IBS 机制实现了高精度事件采样。二者的核心原理都是通过硬件在计数器溢出时将处理器现场直接保存到内存，而不是在响应中断时才保存寄存器现场，提高了采样精度。在默认条件下，perf 不使用 PEBS 机制。用户如果想要使用高精度采样，需要在指定性能事件时，在事件名后添加后缀”:p”或”:pp”。Perf在采样精度上定义了4个级别，级别描述如下。
+理想情况下，采样数据应当能够精确描述 PMC 溢出时刻（timestamp）的 CPU 现场。但在实际执行过程中，从 PMI 生成到内核处理 IRQ 的期间，不可避免地会存在时间延迟（delay）[^26]。因此，在采样时获取的指令地址通常并非指向实际触发性能事件的指令，这种现象被称为事件打滑（Event Skid，简称 skid）[^30]。采样数据的偏离程度取决于流水线的数量和深度，以及在 skid 期间的指令执行情况。如果恰好发生了分支跳转，被采样的指令地址可能会与实际触发性能事件的指令地址之间相差数百个字节，解析出的函数名、指令名、指令参数等数据的正确性将难以保证[^24]。
 
-* 0 无精度保证  
-* 1 采样指令与触发性能事件的指令之间的偏差为常数（:p）
-* 2 需要尽量保证采样指令与触发性能事件的指令之间的偏差为 0（:pp）
-* 3 保证采样指令与触发性能事件的指令之间的偏差必须为 0（:ppp）
+<div align="center">
+<img src="https://ieeexplore.ieee.org/mediastore_new/IEEE/content/media/71/10075651/10068807/sason1-3257105-large.gif"/>
+<p>图5 Intel PEBS 的工作过程</p>
+</div>
+
+在 Nehalem 架构中，Intel 首次应用了事件驱动的精确采样（Precise Event-Based Sampling，简称 PEBS）机制[^31]，其工作过程如图 5 所示[^32]。启用 PEBS 支持后，PEBS 辅助模块（assist）将在 PMC 溢出时被激活。等到被监测的性能事件再次发生时，PEBS 辅助模块会将当前时刻的上下文信息暂存到 PEBS 缓冲区中，并重置 PMC 的值以准备执行下一轮采样。当 PEBS 缓冲区中存储的数据量达到设定的阈值时，会触发一个硬件中断以通知内核读取采样数据[^32]。
+
+与基于 PMI 的采样方法相比，使用 PEBS 能够避免因 IRQ 处理延迟导致的 skid，被采样的指令地址的偏移程度得以有效控制。基于 PEBS，perf 能够获得更精确的采样结果，可以通过添加不同数量的事件修饰符 `p` 来指定性能事件的采样精度。每个精度级别对应的描述如下：
+
+* 0 - 不限制指令地址的偏移程度
+* 1 - 必须保证指令地址的偏移量为常数级别
+* 2 - 尽量保证指令地址的偏移量为 0（插入 lfence 屏障）
+* 3 - 必须保证指令地址的偏移量为 0（清空流水线，但已经提交的指令无法撤回）
+
+精度级别为 0 时，perf 不限制因 skid 造成的指令地址偏移的数量级。当精度级别为 1 到 3 时，perf 会通过 PEBS 机制降低 skid 的影响，以实现高精度的事件采样。
+
+但因为 shadow effect 的存在，使用 PEBS 只能尽量保证 skid 为 0，第三级精度仅能在某些特定情况下实现，例如全局仅采样单个事件。
 
 ### 优势与局限
 
-## 基于模拟器的性能分析
+优势：利用硬件性能计数器，能够用较低代价监测处理器内部的实际执行情况，并且通过与软件性能计数器结合，能够分析程序实际运行时的热点代码、性能瓶颈（访存、IO、ALU 计算），针对热点进行优化往往效果最好。
 
-### 案例
+局限：但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，需要监听的硬件事件数量过多则需要配置复用[^35]，此外，不容易保证多线程读写同步，而且分析 MPI 程序非常困难。计数器多路复用、线程上下文切换保存计数器等必要功能都会带来额外的测量开销，perf 工具的测量开销是客观存在的，尽管针对大型程序来说，这种开销可能微不足道，但这也可能影响小型程序的性能分析结果[^36]。此外，PMU 没有定义的、操作系统也无法收集的数据，就无法通过基于性能计数器的性能分析工具收集。例如指令的逐条分类统计。
+
+## 基于模拟器的性能分析
 
 QEMU
 
 ## 基于二进制插桩的性能分析
-
-### 案例
 
 Gprof、DynamoRIO、Valgrind、Pin
 
@@ -121,9 +134,14 @@ Gprof、DynamoRIO、Valgrind、Pin
 [^22]: Giraldeau, Francis, et al. "Recovering system metrics from kernel trace." _Linux Symposium_. Vol. 109. 2011.
 [^23]: Rostedt, Steven, and Red Hat. "Ftrace kernel hooks: more than just tracing." _Linux Plumbers Conference_. 2014.
 [^24]: "Perf_events tutorial", 2012, [online] Available: http://perf.wiki.kemel.org/.
-[^25]: "Diving into Linux Perf Ring Buffer", 2021, [online] Available: https://people.linaro.org/~leo.yan/debug/perf/Diving_into_Linux_Perf_Ring_Buffer.pdf.
-[^26]: Akiyama, Soramichi, and Takahiro Hirofuchi. "Quantitative evaluation of intel pebs overhead for online system-noise analysis." _Proceedings of the 7th International Workshop on Runtime and Operating Systems for Supercomputers ROSS 2017_. 2017.
-[^27]: Sprunt, Brinkley. "Pentium 4 performance-monitoring features." _Ieee Micro_ 22.04 (2002): 72-82.
+[^25]: "Modern Microprocessors: A 90-Minute Guide!", 2016, [online] Available: https://www.lighterra.com/papers/modernmicroprocessors/
+[^26]: Yi, Jifei, et al. "On the precision of precise event based sampling." _Proceedings of the 11th ACM SIGOPS Asia-Pacific Workshop on Systems_. 2020.
+[^27]: "Diving into Linux Perf Ring Buffer", 2021, [online] Available: https://people.linaro.org/~leo.yan/debug/perf/Diving_into_Linux_Perf_Ring_Buffer.pdf.
+[^28]: Sprunt, Brinkley. "Pentium 4 performance-monitoring features." _Ieee Micro_ 22.04 (2002): 72-82.
+[^29]: Akiyama, Soramichi, and Takahiro Hirofuchi. "Quantitative evaluation of intel pebs overhead for online system-noise analysis." _Proceedings of the 7th International Workshop on Runtime and Operating Systems for Supercomputers ROSS 2017_. 2017.
+[^30]: Intel VTune Amplifier XE 2011 Getting Started Tutorials for Linux OS, 2010. Section Key Concept: Event Skid.
+[^31]: Intel, “Intel Microarchitecture Codename Nehalem Performance Monitoring Unit Programming Guide,” https://software.intel.com/sites/default/files/m/5/2/c/f/ 1/30320-Nehalem-PMU-Programming-Guide-Core.pdf, 2010.
+[^32]: Sasongko, Muhammad Aditya, et al. "Precise Event Sampling on AMD Versus Intel: Quantitative and Qualitative Comparison." _IEEE Transactions on Parallel and Distributed Systems_ 34.5 (2023): 1594-1608.
 
-[^29]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
-[^30]: V. Salapura, K. Ganesan, A. Gara, M. Gscwind, J. Sexton and R. Walkup, "Next-generation performance counters: Towards monitoring over thousand concurrent events", _Proc. IEEE International Symposium on Performance Analysis of Systems and Software_, pp. 139-146, Apr. 2008.
+[^35]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
+[^36]: V. Salapura, K. Ganesan, A. Gara, M. Gscwind, J. Sexton and R. Walkup, "Next-generation performance counters: Towards monitoring over thousand concurrent events", _Proc. IEEE International Symposium on Performance Analysis of Systems and Software_, pp. 139-146, Apr. 2008.
