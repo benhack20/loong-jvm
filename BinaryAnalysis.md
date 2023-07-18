@@ -10,7 +10,7 @@
 
 而软件性能计数器则是指定义在操作系统内核或用户级别软件内部的特殊数据结构[^5][^6]。软件性能计数器既可以使用 PAPI[^7]、Perfctr[^8]、Perfmon2[^9] 等工具提供的硬件计数器映射接口实现，也可以是直接在软件层面定义的具有专门用途的实例（instance）[^10]。例如在 Linux 中，存在专门用于记录和修改系统运行时信息的 `/proc` 文件系统，可以通过 `cat /proc/stat` 查看从系统启动（boot）到当前时刻发生的上下文切换（ctxt）、启动进程（processes）、软件中断（softirq）等行为的数量[^11]，其中的部分数据使用内核中定义的软件性能计数器记录。
 
-> 以 ctxt 数据的获取过程为例：每个 CPU 实例都会维护自己的运行队列数据结构体（Runqueue Data Structure），该结构体被定义在 `sched.h` 文件中。其中的 `nr_switches` 字段用于存储在当前 CPU 上发生过的上下文切换次数，这可以被看作是软件性能计数器的一种具体实现方式。当通过 `cat /proc/stat | grep ctxt` 查看全局上下文切换数据时，`show_stat()` 方法会调用 `kernel_stat.h` 文件中定义的 `nr_context_switches()` 方法，循环遍历所有的 `cpu_rq(i)->nr_switches` 并求和，最终打印出 ctxt 数据。
+以 ctxt 数据的获取过程为例：每个 CPU 实例都会维护自己的运行队列数据结构体（Runqueue Data Structure），该结构体被定义在 `sched.h` 文件中。其中的 `nr_switches` 字段用于存储在当前 CPU 上发生过的上下文切换次数，这可以被看作是软件性能计数器的一种具体实现方式。当通过 `cat /proc/stat | grep ctxt` 查看全局上下文切换数据时，`show_stat()` 方法会调用 `kernel_stat.h` 文件中定义的 `nr_context_switches()` 方法，循环遍历所有的 `cpu_rq(i)->nr_switches` 并求和，最终打印出 ctxt 数据。
 
 ### 性能计数器的基础设施
 
@@ -57,12 +57,6 @@
 
 perf 的实现涉及用户空间、系统内核、硬件三个层级，其整体设计结构如图 3 所示。在用户空间中，通过 perf commands 可以选择要监测的性能事件，并设置数据的采集和分析方式[^24]。在内核中，perf_events 负责维护 tracepoint、kprobes 等基于软件性能计数器的性能事件的数据，同时不断地从 PMU 中获取硬件性能事件的计数值，并根据采样（sample）的精度需求，保存性能事件触发时刻的上下文信息[^19]。此外，为了实现用户空间和内核空间的数据交互，perf_events 还会为每个被监测的 CPU 或线程（仅 per-thread 模式）维护一个用于存储运行时性能数据的环形缓冲区（ring buffer）[^25]。用户空间的应用可通过内存映射（mmap）的方式访问内核中缓存的性能数据，以满足计数（perf stat）、采样（perf record）、追踪（perf trace）等功能的数据需求[^18]。
 
-此外，perf 还允许在指定性能事件时额外添加事件修饰符（Event Modifiers），以实现对性能事件更细致的配置和限制。常用事件修饰符对应的功能如下：
-
-* u - 仅统计在用户空间中触发的性能事件
-* k - 仅统计在内核中触发的性能事件
-* p - 控制性能事件采样的精度级别
-
 现代微处理器普遍基于超标量（superscalar）、深流水（superpipelined）、乱序执行（out-of-order）等技术来提升整体性能[^25]，但复杂的微结构设计也增加了获取精确采样结果的难度[^26]。以 `perf record -e cycles:u -c 1000` 的工作过程为例，其核心功能的调用逻辑如图 4 所示。
 
 <div align="center">
@@ -79,24 +73,21 @@ perf 的实现涉及用户空间、系统内核、硬件三个层级，其整体
 <p>图5 Intel PEBS 的工作过程</p>
 </div>
 
-在 Nehalem 架构中，Intel 首次应用了事件驱动的精确采样（Precise Event-Based Sampling，简称 PEBS）机制[^31]，其工作过程如图 5 所示[^32]。启用 PEBS 支持后，PEBS 辅助模块（assist）将在 PMC 溢出时被激活。等到被监测的性能事件再次发生时，PEBS 辅助模块会将当前时刻的上下文信息暂存到 PEBS 缓冲区中，并重置 PMC 的值以准备执行下一轮采样。当 PEBS 缓冲区中存储的数据量达到设定的阈值时，会触发一个硬件中断以通知内核读取采样数据[^32]。
+在 Nehalem 架构中，Intel 首次应用了事件驱动的精确采样（Precise Event-Based Sampling，简称 PEBS）机制[^31]，其工作过程如图 5 所示。启用 PEBS 支持后，PEBS 辅助模块（assist）将在 PMC 溢出时被激活。等到被监测的性能事件再次发生时，PEBS 辅助模块会将当前时刻的上下文信息暂存到 PEBS 缓冲区中，并重置 PMC 的值以准备执行下一轮采样。当 PEBS 缓冲区中存储的数据量达到设定的阈值时，会触发一个硬件中断以通知内核读取采样数据[^32]。与 PMI 驱动的采样方法相比，使用 PEBS 能够避免因 IRQ 处理延迟而导致的 skid。虽然不能完全消除指令地址的偏移，但基于 PEBS 提供的采样结果能够更准确地描述出性能事件被触发时刻的 CPU 现场[^33]。
 
-与基于 PMI 的采样方法相比，使用 PEBS 能够避免因 IRQ 处理延迟导致的 skid，被采样的指令地址的偏移程度得以有效控制。基于 PEBS，perf 能够获得更精确的采样结果，可以通过添加不同数量的事件修饰符 `p` 来指定性能事件的采样精度。每个精度级别对应的描述如下：
+此外，perf 还允许在指定性能事件时额外添加事件修饰符（Event Modifiers），以实现对性能事件更细致的配置和限制[^34]。常用事件修饰符对应的功能如下：
 
-* 0 - 不限制指令地址的偏移程度
-* 1 - 必须保证指令地址的偏移量为常数级别
-* 2 - 尽量保证指令地址的偏移量为 0（插入 lfence 屏障）
-* 3 - 必须保证指令地址的偏移量为 0（清空流水线，但已经提交的指令无法撤回）
+* u - 仅统计在用户空间中触发的性能事件
+* k - 仅统计在内核中触发的性能事件
+* p - 控制性能事件采样的精度级别
 
-精度级别为 0 时，perf 不限制因 skid 造成的指令地址偏移的数量级。当精度级别为 1 到 3 时，perf 会通过 PEBS 机制降低 skid 的影响，以实现高精度的事件采样。
-
-但因为 shadow effect 的存在，使用 PEBS 只能尽量保证 skid 为 0，第三级精度仅能在某些特定情况下实现，例如全局仅采样单个事件。
+可通过添加不同数量的事件修饰符 `p` 来指定性能事件的采样精度级别。当精度级别为 0 时，perf 使用 PMI 驱动的采样方法，不限制因 skid 造成的指令地址偏移的数量级。当精度级别为 1 到 3 时，perf 会应用 PEBS 机制来避免发生 skid，并通过插入内存屏障、清空流水线等方式，尽可能地保证指令地址不发生偏移[^34]。但由于叠影现象（Shadow Effect）的存在[^26]，同时监听多个性能事件时，PEBS 并不能完全保证采样的精度[^33][^35]。
 
 ### 优势与局限
 
-优势：利用硬件性能计数器，能够用较低代价监测处理器内部的实际执行情况，并且通过与软件性能计数器结合，能够分析程序实际运行时的热点代码、性能瓶颈（访存、IO、ALU 计算），针对热点进行优化往往效果最好。
+硬件性能计数器是芯片内部（on-chip）的性能监测基础设施，通过与操作系统中定义的软件性能计数器相结合，能够以较低的监测开销为代价，获取相对精确的运行时性能数据[^19]。基于运行时性能数据，可以分析出被监测程序的性能瓶颈和热点代码片段，从而实现针对性优化[^6]。此外，基于性能计数器的性能分析工具通常是低侵入性的，不需要修改被监测程序的代码即可实现多维度的性能事件监听[^8]。
 
-局限：但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，需要监听的硬件事件数量过多则需要配置复用[^35]，此外，不容易保证多线程读写同步，而且分析 MPI 程序非常困难。计数器多路复用、线程上下文切换保存计数器等必要功能都会带来额外的测量开销，perf 工具的测量开销是客观存在的，尽管针对大型程序来说，这种开销可能微不足道，但这也可能影响小型程序的性能分析结果[^36]。此外，PMU 没有定义的、操作系统也无法收集的数据，就无法通过基于性能计数器的性能分析工具收集。例如指令的逐条分类统计。
+但基于性能计数器的性能分析方法也存在一定的局限性。首先，硬件性能计数器的配置过程较为繁琐，多线程场景下应当保证计数值的读写同步，监听的硬件事件数量过多时则需要多路复用（Multiplexing）[^36]。其次，性能计数器的监测开销是客观存在的，在高负载场景下可能会影响被监测程序的运行时行为[^37]。此外，硬件性能计数器只能统计 当前平台支持的硬件性能事件，数据采集的粒度和精度完全依赖于微结构的实现。
 
 ## 基于模拟器的性能分析
 
@@ -142,6 +133,8 @@ Gprof、DynamoRIO、Valgrind、Pin
 [^30]: Intel VTune Amplifier XE 2011 Getting Started Tutorials for Linux OS, 2010. Section Key Concept: Event Skid.
 [^31]: Intel, “Intel Microarchitecture Codename Nehalem Performance Monitoring Unit Programming Guide,” https://software.intel.com/sites/default/files/m/5/2/c/f/ 1/30320-Nehalem-PMU-Programming-Guide-Core.pdf, 2010.
 [^32]: Sasongko, Muhammad Aditya, et al. "Precise Event Sampling on AMD Versus Intel: Quantitative and Qualitative Comparison." _IEEE Transactions on Parallel and Distributed Systems_ 34.5 (2023): 1594-1608.
-
-[^35]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
-[^36]: V. Salapura, K. Ganesan, A. Gara, M. Gscwind, J. Sexton and R. Walkup, "Next-generation performance counters: Towards monitoring over thousand concurrent events", _Proc. IEEE International Symposium on Performance Analysis of Systems and Software_, pp. 139-146, Apr. 2008.
+[^33]: Xu, Hao, et al. "Can we trust profiling results? Understanding and fixing the inaccuracy in modern profilers." _Proceedings of the ACM International Conference on Supercomputing_. 2019.
+[^34]: Ghods, Amir Reza. _A study of Linux Perf and slab allocation sub-systems_. MS thesis. University of Waterloo, 2016.
+[^35]: Nowak, Andrzej, et al. "Establishing a base of trust with performance counters for enterprise workloads." _2015 USENIX Annual Technical Conference (USENIX ATC 15)_. 2015.
+[^36]: Zaparanuks, Dmitrijs, Milan Jovic, and Matthias Hauswirth. "Accuracy of performance counter measurements." _2009 IEEE International Symposium on Performance Analysis of Systems and Software_. IEEE, 2009.
+[^37]: V. Salapura, K. Ganesan, A. Gara, M. Gscwind, J. Sexton and R. Walkup, "Next-generation performance counters: Towards monitoring over thousand concurrent events", _Proc. IEEE International Symposium on Performance Analysis of Systems and Software_, pp. 139-146, Apr. 2008.
