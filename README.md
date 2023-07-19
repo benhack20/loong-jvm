@@ -8,6 +8,7 @@
 - Why.md：静态和动态程序分析的实例和局限。
 - How.md：程序分析方法。
 - Tools.md：动态程序分析工具。
+- Plan.md：分析工具和目标方案。
 - AOP.md：介绍AOP编程。
 - BinaryAnalysis.md：针对二进制可执行文件进行分析的方法。
 
