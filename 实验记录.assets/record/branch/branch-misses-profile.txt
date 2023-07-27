@@ -1,0 +1,1479 @@
+--- Execution profile ---
+Total samples       : 1708030
+unknown_Java        : 4371 (0.26%)
+not_walkable_Java   : 52 (0.00%)
+deoptimization      : 20 (0.00%)
+
+--- 237274361 total (13.89%), 237276 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 235024187 total (13.76%), 235029 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 196125995 total (11.48%), 196128 samples
+  [ 0] spec.benchmarks.compress.CodeTable.of
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 153748662 total (9.00%), 153751 samples
+  [ 0] spec.benchmarks.compress.Compressor$HashTable.of
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 99958337 total (5.85%), 99957 samples
+  [ 0] spec.benchmarks.compress.Decompressor$SuffixTable.of
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 82658433 total (4.84%), 82663 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 53275885 total (3.12%), 53278 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 42937587 total (2.51%), 42937 samples
+  [ 0] spec.benchmarks.compress.Decompressor.decompress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 41378112 total (2.42%), 41381 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 40749231 total (2.39%), 40749 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 28913546 total (1.69%), 28914 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.pop
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 25685407 total (1.50%), 25686 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 24109571 total (1.41%), 24089 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 21018195 total (1.23%), 21020 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 19447443 total (1.14%), 19448 samples
+  [ 0] spec.benchmarks.compress.Decompressor.decompress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 19244839 total (1.13%), 19247 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 19094705 total (1.12%), 19096 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 17475046 total (1.02%), 17476 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 14076380 total (0.82%), 14077 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 12811503 total (0.75%), 12801 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 12346473 total (0.72%), 12347 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 12065983 total (0.71%), 12067 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 11667719 total (0.68%), 11669 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 8579635 total (0.50%), 8580 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 8540170 total (0.50%), 8540 samples
+  [ 0] spec.benchmarks.compress.Decompressor.decompress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 8522227 total (0.50%), 8523 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 8261344 total (0.48%), 8262 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 8026541 total (0.47%), 8027 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 7853458 total (0.46%), 7854 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Compressor.output
+  [ 2] spec.benchmarks.compress.Compressor.compress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 7263584 total (0.43%), 7264 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 7095189 total (0.42%), 7096 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 7031430 total (0.41%), 7032 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 6312624 total (0.37%), 6310 samples
+  [ 0] spec.benchmarks.compress.CodeTable.of
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 6162223 total (0.36%), 6163 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 5763436 total (0.34%), 5764 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 5725650 total (0.34%), 5726 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 4501724 total (0.26%), 4502 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 4478361 total (0.26%), 4479 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 4047777 total (0.24%), 4048 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 3622652 total (0.21%), 3623 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 3479019 total (0.20%), 3479 samples
+  [ 0] spec.benchmarks.compress.Decompressor$SuffixTable.of
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 3478724 total (0.20%), 3479 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 3401660 total (0.20%), 3402 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 3378882 total (0.20%), 3379 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 3132778 total (0.18%), 3133 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 3002802 total (0.18%), 3003 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Compressor.output
+  [ 2] spec.benchmarks.compress.Compressor.compress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 2905762 total (0.17%), 2906 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2890863 total (0.17%), 2891 samples
+  [ 0] spec.benchmarks.compress.CodeTable.of
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2877793 total (0.17%), 2878 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] [unknown_Java]
+  [ 2] [BenchmarkThread compress 1 tid=530601]
+
+--- 2869787 total (0.17%), 2870 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2868792 total (0.17%), 2869 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2810908 total (0.16%), 2809 samples
+  [ 0] spec.benchmarks.compress.Decompressor.decompress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 2807568 total (0.16%), 2808 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 2736980 total (0.16%), 2737 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2651791 total (0.16%), 2652 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2613690 total (0.15%), 2614 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2589819 total (0.15%), 2590 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2521689 total (0.15%), 2522 samples
+  [ 0] spec.benchmarks.compress.Compressor$HashTable.of
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2478174 total (0.15%), 2478 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2388956 total (0.14%), 2389 samples
+  [ 0] spec.benchmarks.compress.Decompressor.decompress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 2379334 total (0.14%), 2378 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2336828 total (0.14%), 2337 samples
+  [ 0] spec.benchmarks.compress.CodeTable.of
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 2077848 total (0.12%), 2078 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1968830 total (0.12%), 1969 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 1967868 total (0.12%), 1968 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1909882 total (0.11%), 1910 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 1870908 total (0.11%), 1871 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 1823806 total (0.11%), 1824 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1817806 total (0.11%), 1818 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1810832 total (0.11%), 1811 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1804862 total (0.11%), 1805 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1779736 total (0.10%), 1780 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 1737833 total (0.10%), 1738 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1676819 total (0.10%), 1677 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1627859 total (0.10%), 1628 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1619880 total (0.09%), 1620 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readByte
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1566806 total (0.09%), 1567 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 1564885 total (0.09%), 1565 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1462901 total (0.09%), 1463 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 1441934 total (0.08%), 1442 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1441837 total (0.08%), 1442 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1435883 total (0.08%), 1436 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] [unknown_Java]
+  [ 2] [BenchmarkThread compress 1 tid=530601]
+
+--- 1420693 total (0.08%), 1420 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 1401931 total (0.08%), 1402 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.pop
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1388875 total (0.08%), 1389 samples
+  [ 0] spec.benchmarks.compress.CodeTable.set
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1385830 total (0.08%), 1386 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+--- 1376919 total (0.08%), 1377 samples
+  [ 0] spec.benchmarks.compress.InputBuffer.readBytes
+  [ 1] spec.benchmarks.compress.Decompressor.getCode
+  [ 2] spec.benchmarks.compress.Decompressor.decompress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 1342917 total (0.08%), 1343 samples
+  [ 0] spec.benchmarks.compress.CodeTable.set
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1340925 total (0.08%), 1341 samples
+  [ 0] spec.benchmarks.compress.CodeTable.clear
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1283856 total (0.08%), 1284 samples
+  [ 0] spec.benchmarks.compress.Compressor$HashTable.set
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1213958 total (0.07%), 1214 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1211033 total (0.07%), 1211 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1201184 total (0.07%), 1200 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1186723 total (0.07%), 1186 samples
+  [ 0] spec.benchmarks.compress.Decompressor.getCode
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1101990 total (0.06%), 1102 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1101261 total (0.06%), 1101 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1025880 total (0.06%), 1026 samples
+  [ 0] spec.benchmarks.compress.Compressor.output
+  [ 1] spec.benchmarks.compress.Compressor.compress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1018900 total (0.06%), 1019 samples
+  [ 0] spec.benchmarks.compress.OutputBuffer.writeByte
+  [ 1] spec.benchmarks.compress.Compressor.output
+  [ 2] spec.benchmarks.compress.Compressor.compress
+  [ 3] spec.benchmarks.compress.Compress.performAction
+  [ 4] spec.benchmarks.compress.Harness.runCompress
+  [ 5] spec.benchmarks.compress.Harness.inst_main
+  [ 6] spec.benchmarks.compress.Main.runBenchmark
+  [ 7] spec.benchmarks.compress.Main.harnessMain
+  [ 8] spec.harness.BenchmarkThread.runLoop
+  [ 9] spec.harness.BenchmarkThread.executeIteration
+  [10] spec.harness.BenchmarkThread.run
+  [11] [BenchmarkThread compress 1 tid=530601]
+
+--- 1002237 total (0.06%), 1002 samples
+  [ 0] spec.benchmarks.compress.Decompressor$DeStack.push
+  [ 1] spec.benchmarks.compress.Decompressor.decompress
+  [ 2] spec.benchmarks.compress.Compress.performAction
+  [ 3] spec.benchmarks.compress.Harness.runCompress
+  [ 4] spec.benchmarks.compress.Harness.inst_main
+  [ 5] spec.benchmarks.compress.Main.runBenchmark
+  [ 6] spec.benchmarks.compress.Main.harnessMain
+  [ 7] spec.harness.BenchmarkThread.runLoop
+  [ 8] spec.harness.BenchmarkThread.executeIteration
+  [ 9] spec.harness.BenchmarkThread.run
+  [10] [BenchmarkThread compress 1 tid=530601]
+
+--- 1001401 total (0.06%), 1001 samples
+  [ 0] spec.benchmarks.compress.Compressor.compress
+  [ 1] spec.benchmarks.compress.Compress.performAction
+  [ 2] spec.benchmarks.compress.Harness.runCompress
+  [ 3] spec.benchmarks.compress.Harness.inst_main
+  [ 4] spec.benchmarks.compress.Main.runBenchmark
+  [ 5] spec.benchmarks.compress.Main.harnessMain
+  [ 6] spec.harness.BenchmarkThread.runLoop
+  [ 7] spec.harness.BenchmarkThread.executeIteration
+  [ 8] spec.harness.BenchmarkThread.run
+  [ 9] [BenchmarkThread compress 1 tid=530601]
+
+       total  percent  samples  top
+  ----------  -------  -------  ---
+   727041636   42.57%   727029  spec.benchmarks.compress.Compressor.compress
+   208553535   12.21%   208553  spec.benchmarks.compress.CodeTable.of
+   156372334    9.16%   156375  spec.benchmarks.compress.Compressor$HashTable.of
+   140662157    8.24%   140672  spec.benchmarks.compress.Compressor.output
+   114180542    6.68%   114183  spec.benchmarks.compress.Decompressor$DeStack.push
+   104781352    6.13%   104779  spec.benchmarks.compress.Decompressor$SuffixTable.of
+    81949939    4.80%    81948  spec.benchmarks.compress.Decompressor.decompress
+    36938597    2.16%    36941  spec.benchmarks.compress.OutputBuffer.writeByte
+    31259327    1.83%    31261  spec.benchmarks.compress.InputBuffer.readBytes
+    30785493    1.80%    30786  spec.benchmarks.compress.Decompressor$DeStack.pop
+    24141789    1.41%    24140  spec.benchmarks.compress.Decompressor.getCode
+    16345173    0.96%    16347  spec.benchmarks.compress.InputBuffer.readByte
+     3371727    0.20%     3372  spec.benchmarks.compress.CodeTable.set
+     1380941    0.08%     1381  spec.benchmarks.compress.CodeTable.clear
+     1283856    0.08%     1284  spec.benchmarks.compress.Compressor$HashTable.set
+     1036960    0.06%     1037  spec.benchmarks.compress.Decompressor$SuffixTable.set
+      906032    0.05%      906  spec.benchmarks.compress.Decompressor$DeStack.isEmpty
+      815043    0.05%      815  IndexSetIterator::advance_and_next()
+      430921    0.03%      431  PhaseIdealLoop::build_loop_early(VectorSet&, Node_List&, Node_Stack&)
+      429052    0.03%      429  PhaseIdealLoop::build_loop_late(VectorSet&, Node_List&, Node_Stack&)
+      371059    0.02%      371  PhaseLive::compute(unsigned int)
+      309997    0.02%      310  PhaseIdealLoop::build_loop_tree()
+      299031    0.02%      299  PhaseIdealLoop::build_loop_late_post_work(Node*, bool)
+      291000    0.02%      291  PhaseChaitin::gather_lrg_masks(bool) [clone .constprop.1]
+      263972    0.02%      264  PhaseIterGVN::add_users_to_worklist(Node*)
+      260986    0.02%      261  PhaseChaitin::interfere_with_live(unsigned int, IndexSet*) [clone .part.0]
+      219978    0.01%      220  PhaseChaitin::Split(unsigned int, ResourceArea*)
+      207077    0.01%      207  PhaseIdealLoop::Dominators()
+      189984    0.01%      190  /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+      187018    0.01%      187  NodeHash::hash_find_insert(Node*)
+      183013    0.01%      183  DebugInformationRecorder::find_sharable_decode_offset(int)
+      179993    0.01%      180  PhaseChaitin::build_ifg_physical(ResourceArea*)
+      161019    0.01%      161  Matcher::find_shared(Node*)
+      148216    0.01%      148  psi_group_change_[k]
+      144986    0.01%      145  PhaseIterGVN::remove_globally_dead_node(Node*)
+      141012    0.01%      141  __memset_avx2_unaligned_erms
+      140977    0.01%      141  PhaseIdealLoop::split_if_with_blocks_pre(Node*)
+      139977    0.01%      140  Dict::Insert(void*, void*, bool)
+      133984    0.01%      134  __tls_get_addr
+      131994    0.01%      132  PhaseIdealLoop::get_late_ctrl_with_anti_dep(LoadNode*, Node*, Node*)
+      129004    0.01%      129  LinearScanWalker::alloc_free_reg(Interval*)
+      127990    0.01%      128  PhaseIterGVN::transform_old(Node*)
+      124002    0.01%      124  LinearScan::allocate_registers()
+      123999    0.01%      124  LinearScan::assign_reg_num(GrowableArray<LIR_Op*>*, IntervalWalker*)
+      123985    0.01%      124  PhaseChaitin::add_input_to_liveout(Block*, Node*, IndexSet*, double, PhaseChaitin::Pressure&, PhaseChaitin::Pressure&)
+      123038    0.01%      123  Compile::identify_useful_nodes(Unique_Node_List&)
+      122013    0.01%      122  PhaseOutput::BuildOopMaps()
+      119986    0.01%      120  PhaseIdealLoop::compute_early_ctrl(Node*, Node*)
+      117005    0.01%      117  PhaseCFG::schedule_local(Block*, GrowableArray<int>&, VectorSet&, long*)
+      117003    0.01%      117  Node::set_req_X(unsigned int, Node*, PhaseIterGVN*)
+      112002    0.01%      112  PhaseIdealLoop::split_if_with_blocks(VectorSet&, Node_Stack&)
+      106987    0.01%      107  PhaseChaitin::post_allocate_copy_removal()
+      102992    0.01%      103  Node_Backward_Iterator::next()
+      102041    0.01%      102  spec.benchmarks.compress.Harness.runCompress
+      101020    0.01%      101  __memmove_avx_unaligned_erms
+       97007    0.01%       97  PhaseLive::add_liveout(Block_List&, Block*, IndexSet*, VectorSet&)
+       94982    0.01%       95  PhaseCCP::push_more_uses(Unique_Node_List&, Node*, Node const*) const
+       94029    0.01%       94  PhaseCCP::transform(Node*) [clone .part.0]
+       92985    0.01%       93  LinearScan::build_intervals()
+       92002    0.01%       92  LinearScanWalker::free_collect_inactive_fixed(Interval*)
+       91992    0.01%       92  PhaseIdealLoop::get_early_ctrl(Node*)
+       91982    0.01%       92  Matcher::xform(Node*, int)
+       91028    0.01%       91  NTarjan::DFS(NTarjan*, VectorSet&, PhaseIdealLoop*, unsigned int*)
+       89992    0.01%       90  Rewriter::scan_method(Thread*, Method*, bool, bool*)
+       88992    0.01%       89  LIR_OpVisitState::visit(LIR_Op*)
+       88981    0.01%       89  PhaseIdealLoop::split_if_with_blocks_post(Node*)
+       84104    0.00%       84  update_load_avg_[k]
+       84026    0.00%       84  PhaseCFG::schedule_early(VectorSet&, Node_Stack&)
+       83005    0.00%       83  PhaseChaitin::elide_copy(Node*, int, Block*, Node_List*, Node_List*, bool)
+       82997    0.00%       83  ConcurrentHashTable<SymbolTableConfig, (MEMFLAGS)11>::Node* ConcurrentHashTable<SymbolTableConfig, (MEMFLAGS)11>::get_node<SymbolTableLookup>(ConcurrentHashTable<SymbolTableConfig, (MEMFLAGS)11>::Bucket const*, SymbolTableLookup&, bool*, unsigned long*) const
+       82990    0.00%       83  PhaseIdealLoop::build_loop_tree_impl(Node*, int)
+       81995    0.00%       82  PhaseIterGVN::subsume_node(Node*, Node*)
+       81000    0.00%       81  PhaseChaitin::Simplify()
+       80013    0.00%       80  PhaseIFG::SquareUp()
+       79006    0.00%       79  PhaseChaitin::Select()
+       78990    0.00%       79  InstanceKlass::find_method_index(Array<Method*> const*, Symbol const*, Symbol const*, Klass::OverpassLookupMode, Klass::StaticLookupMode, Klass::PrivateLookupMode) [clone .constprop.0]
+       78003    0.00%       78  PhaseIdealLoop::compute_lca_of_uses(Node*, Node*, bool)
+       77993    0.00%       78  Compile::final_graph_reshaping_walk(Node_Stack&, Node*, Final_Reshape_Counts&, Unique_Node_List&)
+       76087    0.00%       76  rmqueue_bulk_[k]
+       75004    0.00%       75  Node::replace_edge(Node*, Node*, PhaseGVN*)
+       74009    0.00%       74  Compile::disconnect_useless_nodes(Unique_Node_List&, Unique_Node_List*)
+       73999    0.00%       74  PhaseChaitin::gather_lrg_masks(bool)
+       73987    0.00%       74  MachNode::rematerialize() const
+       71993    0.00%       72  PhaseChaitin::gather_lrg_masks(bool) [clone .constprop.0]
+       71005    0.00%       71  ciObjectFactory::get_metadata(Metadata*)
+       70999    0.00%       71  LinearScan::compute_local_live_sets()
+       70998    0.00%       71  Node::clone() const
+       70106    0.00%       70  read_tsc_[k]
+       69989    0.00%       70  resource_allocate_bytes(unsigned long, AllocFailStrategy::AllocFailEnum)
+       69077    0.00%       69  __update_load_avg_se_[k]
+       68009    0.00%       68  ValueStack::values_do(ValueVisitor*)
+       67987    0.00%       68  PhaseIdealLoop::try_sink_out_of_loop(Node*)
+       66972    0.00%       67  ProjNode::pinned() const
+       64009    0.00%       64  PhaseIFG::effective_degree(unsigned int) const
+       63991    0.00%       64  PhaseCCP::analyze()
+       62173    0.00%       62  timekeeping_advance_[k]
+       61990    0.00%       62  PhaseIdealLoop::dom_lca_for_get_late_ctrl_internal(Node*, Node*, Node*)
+       61021    0.00%       61  PhaseChaitin::merge_multidefs()
+       60996    0.00%       61  Type::cmp(Type const*, Type const*)
+       60989    0.00%       61  MachNode::in_RegMask(unsigned int) const
+       60002    0.00%       60  Node::hash() const
+       60002    0.00%       60  Matcher::match_tree(Node const*)
+       59000    0.00%       59  vmSymbols::find_sid(Symbol const*)
+       58997    0.00%       59  PhaseIFG::re_insert(unsigned int)
+       58991    0.00%       59  PhaseCFG::schedule_late(VectorSet&, Node_Stack&)
+       58979    0.00%       59  Node::has_special_unique_user() const
+       58009    0.00%       58  Node::unique_ctrl_out_or_null() const
+       57058    0.00%       57  update_curr_[k]
+       55994    0.00%       56  LIR_OpVisitState::append(LIR_Opr&, LIR_OpVisitState::OprMode)
+       55992    0.00%       56  PhaseAggressiveCoalesce::insert_copies(Matcher&)
+       54997    0.00%       55  PhaseChaitin::build_ifg_virtual()
+       53997    0.00%       54  TypeNode::hash() const
+       53980    0.00%       54  InstanceKlass::find_local_field(Symbol*, Symbol*, fieldDescriptor*) const
+       52005    0.00%       52  PhiNode::pinned() const
+       51071    0.00%       51  __hrtimer_next_event_base_[k]
+       50997    0.00%       51  ProjNode::is_uncommon_trap_if_pattern(Deoptimization::DeoptReason)
+       48999    0.00%       49  PhaseCFG::schedule_pinned_nodes(VectorSet&)
+       48996    0.00%       49  PhaseChaitin::remove_bound_register_from_interfering_live_ranges(LRG&, IndexSet*, unsigned int&) [clone .part.0]
+       47992    0.00%       48  PhaseIdealLoop::has_local_phi_input(Node*)
+       47005    0.00%       47  PhaseIFG::remove_node(unsigned int)
+       46000    0.00%       46  SymbolTable::do_add_if_needed(char const*, int, unsigned long, bool)
+       45996    0.00%       46  Compile::remove_useless_node(Node*)
+       45034    0.00%       45  __update_load_avg_cfs_rq_[k]
+       45009    0.00%       45  NodeHash::grow()
+       44998    0.00%       45  sun.security.provider.SHA.implCompress0
+       44990    0.00%       45  ClassFileParser::parse_constant_pool_entries(ClassFileStream const*, ConstantPool*, int, JavaThread*)
+       44981    0.00%       45  ClassFileParser::parse_constant_pool(ClassFileStream const*, ConstantPool*, int, JavaThread*) [clone .part.0]
+       43993    0.00%       44  Matcher::Label_Root(Node const*, State*, Node*, Node*&)
+       42007    0.00%       42  PhaseChaitin::bias_color(LRG&, int)
+       42001    0.00%       42  PhaseCFG::select(Block*, Node_List&, GrowableArray<int>&, VectorSet&, unsigned int, long*)
+       42001    0.00%       42  NullCheckEliminator::iterate_one(BlockBegin*)
+       42000    0.00%       42  Node::is_CFG() const
+       41995    0.00%       42  PhaseIdealLoop::get_ctrl(Node const*)
+       41992    0.00%       42  java.util.jar.JarFile.match
+       41003    0.00%       41  Rewriter::compute_index_maps()
+       40998    0.00%       41  RegionNode::Ideal(PhaseGVN*, bool)
+       40985    0.00%       41  __memcmp_avx2_movbe
+       40010    0.00%       40  ProjNode::is_CFG() const
+       40000    0.00%       40  CProjNode::is_block_proj() const
+       39994    0.00%       40  Node::remove_dead_region(PhaseGVN*, bool)
+       39005    0.00%       39  __vfprintf_internal
+       37999    0.00%       38  PhiNode::Ideal(PhaseGVN*, bool)
+       37995    0.00%       38  IntervalWalker::walk_to(int)
+       37994    0.00%       38  Unique_Node_List::remove(Node*)
+       36996    0.00%       37  PhaseOutput::fill_buffer(CodeBuffer*, unsigned int*)
+       36988    0.00%       37  Arena::Arealloc(void*, unsigned long, unsigned long, AllocFailStrategy::AllocFailEnum)
+       36006    0.00%       36  Compile::update_dead_node_list(Unique_Node_List&)
+       35999    0.00%       36  Interpreter
+       35998    0.00%       36  I2C/C2I adapters(0xb)
+       35997    0.00%       36  ciInstanceKlass::get_field_by_offset(int, bool)
+       35997    0.00%       36  Node::disconnect_inputs(Compile*)
+       35993    0.00%       36  Node::out_grow(unsigned int)
+       35990    0.00%       36  PhaseChaitin::stretch_base_pointer_live_ranges(ResourceArea*)
+       35003    0.00%       35  VerifyClassForMajorVersion
+       35001    0.00%       35  PhaseGVN::transform_no_reclaim(Node*)
+       35000    0.00%       35  Arena::contains(void const*) const
+       34007    0.00%       34  Dict::doubhash()
+       33998    0.00%       34  LinearScan::use_kind_of_input_operand(LIR_Op*, LIR_Opr)
+       33997    0.00%       34  InstanceKlass::field(int) const
+       33990    0.00%       34  spec.benchmarks.compress.Compressor.clBlock
+       33975    0.00%       34  ClassFileParser::parse_method(ClassFileStream const*, bool, ConstantPool const*, bool*, JavaThread*)
+       33008    0.00%       33  Compile::remove_speculative_types(PhaseIterGVN&) [clone .part.0]
+       32999    0.00%       33  IdealLoopTree::policy_range_check(PhaseIdealLoop*, bool, BasicType) const
+       32995    0.00%       33  PhaseCFG::adjust_register_pressure(Node*, Block*, long*, bool)
+       32002    0.00%       32  Node::pinned() const
+       31999    0.00%       32  PhiNode::Value(PhaseGVN*) const
+       31997    0.00%       32  java.lang.Long.getChars
+       31054    0.00%       31  mem_cgroup_css_rstat_flush_[k]
+       31005    0.00%       31  PhaseIdealLoop::remix_address_expressions(Node*)
+       31000    0.00%       31  msort_with_tmp.part.0
+       30999    0.00%       31  IndexSet::alloc_block_containing(unsigned int)
+       30996    0.00%       31  PhaseIdealLoop::is_dominator(Node*, Node*)
+       30073    0.00%       30  hrtimer_interrupt_[k]
+       30020    0.00%       30  iterate_groups.isra.0_[k]
+       29997    0.00%       30  RegMask::is_misaligned_pair() const
+       29996    0.00%       30  Invariance::is_invariant(Node*)
+       29993    0.00%       30  Interval::split_child_at_op_id(int, LIR_OpVisitState::OprMode)
+       29011    0.00%       29  jbyte_disjoint_arraycopy
+       28992    0.00%       29  __GI__IO_default_xsputn
+       28988    0.00%       29  RelocIterator::advance_over_prefix()
+       28006    0.00%       28  PhaseIterGVN::PhaseIterGVN(PhaseGVN*)
+       28006    0.00%       28  LinearScan::eliminate_spill_moves()
+       28002    0.00%       28  TypeLong::eq(Type const*) const
+       28001    0.00%       28  PhaseCCP::transform_once(Node*)
+       27999    0.00%       28  java.util.concurrent.ConcurrentHashMap.transfer
+       27997    0.00%       28  RegMask::Size() const
+       27990    0.00%       28  Node::jvms() const
+       27037    0.00%       27  __hrtimer_run_queues_[k]
+       27017    0.00%       27  timerqueue_add_[k]
+       27002    0.00%       27  RegionNode::is_unreachable_from_root(PhaseGVN const*) const
+       27001    0.00%       27  NodeHash::hash_delete(Node const*)
+       26993    0.00%       27  IfNode::search_identical(int)
+       26058    0.00%       26  native_apic_msr_eoi_write_[k]
+       26036    0.00%       26  task_tick_fair_[k]
+       26007    0.00%       26  spec.benchmarks.compress.Decompressor.<init>
+       26002    0.00%       26  LIRGenerator::state_for(Instruction*, ValueStack*, bool)
+       26001    0.00%       26  PhiNode::Identity(PhaseGVN*)
+       25999    0.00%       26  ValueMap::kill_memory()
+       25997    0.00%       26  Node_Array::insert(unsigned int, Node*)
+       25039    0.00%       25  exit_to_user_mode_prepare_[k]

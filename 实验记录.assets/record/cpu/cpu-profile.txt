@@ -1,0 +1,18 @@
+--- Execution profile ---
+Total samples       : 5495
+unknown_Java        : 6 (0.11%)
+
+          ns  percent  samples  top
+  ----------  -------  -------  ---
+ 26881552418   48.92%     2688  spec.benchmarks.compress.Compressor.compress
+  5370426852    9.77%      537  spec.benchmarks.compress.Decompressor.decompress
+  4060214048    7.39%      406  spec.benchmarks.compress.Compressor.output
+  3400208021    6.19%      340  spec.benchmarks.compress.CodeTable.of
+  2610258269    4.75%      261  spec.benchmarks.compress.Decompressor$DeStack.push
+  2090039176    3.80%      209  spec.benchmarks.compress.Decompressor.getCode
+  1840233671    3.35%      184  spec.benchmarks.compress.InputBuffer.readByte
+  1610062402    2.93%      161  spec.benchmarks.compress.OutputBuffer.writeByte
+  1060033942    1.93%      106  spec.benchmarks.compress.InputBuffer.readBytes
+  1020047202    1.86%      102  spec.benchmarks.compress.CodeTable.set
+   760021135    1.38%       76  spec.benchmarks.compress.Decompressor$DeStack.pop
+   740047901    1.35%       74  spec.benchmarks.compress.Compressor$HashTable.set

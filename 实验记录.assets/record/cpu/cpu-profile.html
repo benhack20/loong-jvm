@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<style>
+	body {margin: 0; padding: 10px 10px 22px 10px; background-color: #ffffff}
+	h1 {margin: 5px 0 0 0; font-size: 18px; font-weight: normal; text-align: center}
+	header {margin: -24px 0 5px 0; line-height: 24px}
+	button {font: 12px sans-serif; cursor: pointer}
+	p {position: fixed; bottom: 0; margin: 0; padding: 2px 3px 2px 3px; outline: 1px solid #ffc000; display: none; overflow: hidden; white-space: nowrap; background-color: #ffffe0}
+	a {color: #0366d6}
+	#hl {position: absolute; display: none; overflow: hidden; white-space: nowrap; pointer-events: none; background-color: #ffffe0; outline: 1px solid #ffc000; height: 15px}
+	#hl span {padding: 0 3px 0 3px}
+	#status {left: 0}
+	#match {right: 0}
+	#reset {cursor: pointer}
+	#canvas {width: 100%; height: 816px}
+</style>
+</head>
+<body style='font: 12px Verdana, sans-serif'>
+<h1>CPU profile</h1>
+<header style='text-align: left'><button id='reverse' title='Reverse'>&#x1f53b;</button>&nbsp;&nbsp;<button id='search' title='Search'>&#x1f50d;</button></header>
+<header style='text-align: right'>Produced by <a href='https://github.com/jvm-profiling-tools/async-profiler'>async-profiler</a></header>
+<canvas id='canvas'></canvas>
+<div id='hl'><span></span></div>
+<p id='status'></p>
+<p id='match'>Matched: <span id='matchval'></span> <span id='reset' title='Clear'>&#x274c;</span></p>
+<script>
+	// Copyright 2020 Andrei Pangin
+	// Licensed under the Apache License, Version 2.0.
+	'use strict';
+	var root, rootLevel, px, pattern;
+	var reverse = false;
+	const levels = Array(51);
+	for (let h = 0; h < levels.length; h++) {
+		levels[h] = [];
+	}
+
+	const canvas = document.getElementById('canvas');
+	const c = canvas.getContext('2d');
+	const hl = document.getElementById('hl');
+	const status = document.getElementById('status');
+
+	const canvasWidth = canvas.offsetWidth;
+	const canvasHeight = canvas.offsetHeight;
+	canvas.style.width = canvasWidth + 'px';
+	canvas.width = canvasWidth * (devicePixelRatio || 1);
+	canvas.height = canvasHeight * (devicePixelRatio || 1);
+	if (devicePixelRatio) c.scale(devicePixelRatio, devicePixelRatio);
+	c.font = document.body.style.font;
+
+	const palette = [
+		[0xb2e1b2, 20, 20, 20],
+		[0x50e150, 30, 30, 30],
+		[0x50cccc, 30, 30, 30],
+		[0xe15a5a, 30, 40, 40],
+		[0xc8c83c, 30, 30, 10],
+		[0xe17d00, 30, 30,  0],
+		[0xcce880, 20, 20, 20],
+	];
+
+	function getColor(p) {
+		const v = Math.random();
+		return '#' + (p[0] + ((p[1] * v) << 16 | (p[2] * v) << 8 | (p[3] * v))).toString(16);
+	}
+
+	function f(level, left, width, type, title, inln, c1, int) {
+		levels[level].push({left: left, width: width, color: getColor(palette[type]), title: title,
+			details: (int ? ', int=' + int : '') + (c1 ? ', c1=' + c1 : '') + (inln ? ', inln=' + inln : '')
+		});
+	}
+
+	function samples(n) {
+		return n === 1 ? '1 sample' : n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' samples';
+	}
+
+	function pct(a, b) {
+		return a >= b ? '100' : (100 * a / b).toFixed(2);
+	}
+
+	function findFrame(frames, x) {
+		let left = 0;
+		let right = frames.length - 1;
+
+		while (left <= right) {
+			const mid = (left + right) >>> 1;
+			const f = frames[mid];
+
+			if (f.left > x) {
+				right = mid - 1;
+			} else if (f.left + f.width <= x) {
+				left = mid + 1;
+			} else {
+				return f;
+			}
+		}
+
+		if (frames[left] && (frames[left].left - x) * px < 0.5) return frames[left];
+		if (frames[right] && (x - (frames[right].left + frames[right].width)) * px < 0.5) return frames[right];
+
+		return null;
+	}
+
+	function search(r) {
+		if (r === true && (r = prompt('Enter regexp to search:', '')) === null) {
+			return;
+		}
+
+		pattern = r ? RegExp(r) : undefined;
+		const matched = render(root, rootLevel);
+		document.getElementById('matchval').textContent = pct(matched, root.width) + '%';
+		document.getElementById('match').style.display = r ? 'inline-block' : 'none';
+	}
+
+	function render(newRoot, newLevel) {
+		if (root) {
+			c.fillStyle = '#ffffff';
+			c.fillRect(0, 0, canvasWidth, canvasHeight);
+		}
+
+		root = newRoot || levels[0][0];
+		rootLevel = newLevel || 0;
+		px = canvasWidth / root.width;
+
+		const x0 = root.left;
+		const x1 = x0 + root.width;
+		const marked = [];
+
+		function mark(f) {
+			return marked[f.left] >= f.width || (marked[f.left] = f.width);
+		}
+
+		function totalMarked() {
+			let total = 0;
+			let left = 0;
+			Object.keys(marked).sort(function(a, b) { return a - b; }).forEach(function(x) {
+				if (+x >= left) {
+					total += marked[x];
+					left = +x + marked[x];
+				}
+			});
+			return total;
+		}
+
+		function drawFrame(f, y, alpha) {
+			if (f.left < x1 && f.left + f.width > x0) {
+				c.fillStyle = pattern && f.title.match(pattern) && mark(f) ? '#ee00ee' : f.color;
+				c.fillRect((f.left - x0) * px, y, f.width * px, 15);
+
+				if (f.width * px >= 21) {
+					const chars = Math.floor(f.width * px / 7);
+					const title = f.title.length <= chars ? f.title : f.title.substring(0, chars - 2) + '..';
+					c.fillStyle = '#000000';
+					c.fillText(title, Math.max(f.left - x0, 0) * px + 3, y + 12, f.width * px - 6);
+				}
+
+				if (alpha) {
+					c.fillStyle = 'rgba(255, 255, 255, 0.5)';
+					c.fillRect((f.left - x0) * px, y, f.width * px, 15);
+				}
+			}
+		}
+
+		for (let h = 0; h < levels.length; h++) {
+			const y = reverse ? h * 16 : canvasHeight - (h + 1) * 16;
+			const frames = levels[h];
+			for (let i = 0; i < frames.length; i++) {
+				drawFrame(frames[i], y, h < rootLevel);
+			}
+		}
+
+		return totalMarked();
+	}
+
+	canvas.onmousemove = function() {
+		const h = Math.floor((reverse ? event.offsetY : (canvasHeight - event.offsetY)) / 16);
+		if (h >= 0 && h < levels.length) {
+			const f = findFrame(levels[h], event.offsetX / px + root.left);
+			if (f) {
+				if (f != root) getSelection().removeAllRanges();
+				hl.style.left = (Math.max(f.left - root.left, 0) * px + canvas.offsetLeft) + 'px';
+				hl.style.width = (Math.min(f.width, root.width) * px) + 'px';
+				hl.style.top = ((reverse ? h * 16 : canvasHeight - (h + 1) * 16) + canvas.offsetTop) + 'px';
+				hl.firstChild.textContent = f.title;
+				hl.style.display = 'block';
+				canvas.title = f.title + '\n(' + samples(f.width) + f.details + ', ' + pct(f.width, levels[0][0].width) + '%)';
+				canvas.style.cursor = 'pointer';
+				canvas.onclick = function() {
+					if (f != root) {
+						render(f, h);
+						canvas.onmousemove();
+					}
+				};
+				status.textContent = 'Function: ' + canvas.title;
+				status.style.display = 'inline-block';
+				return;
+			}
+		}
+		canvas.onmouseout();
+	}
+
+	canvas.onmouseout = function() {
+		hl.style.display = 'none';
+		status.style.display = 'none';
+		canvas.title = '';
+		canvas.style.cursor = '';
+		canvas.onclick = '';
+	}
+
+	canvas.ondblclick = function() {
+		getSelection().selectAllChildren(hl);
+	}
+
+	document.getElementById('reverse').onclick = function() {
+		reverse = !reverse;
+		render();
+	}
+
+	document.getElementById('search').onclick = function() {
+		search(true);
+	}
+
+	document.getElementById('reset').onclick = function() {
+		search(false);
+	}
+
+	window.onkeydown = function() {
+		if (event.ctrlKey && event.keyCode === 70) {
+			event.preventDefault();
+			search(true);
+		} else if (event.keyCode === 27) {
+			search(false);
+		}
+	}
+
+f(0,0,5446,3,'all')
+f(1,0,5363,3,'[BenchmarkThread compress 1 tid=521002]')
+f(2,0,8,3,'[unknown_Java]')
+f(3,0,1,1,'I2C/C2I adapters(0xba)')
+f(3,1,1,3,'SafepointBlob')
+f(4,1,1,5,'asm_exc_page_fault')
+f(5,1,1,5,'exc_page_fault')
+f(6,1,1,5,'do_user_addr_fault')
+f(7,1,1,5,'find_vma')
+f(3,2,2,1,'spec/benchmarks/compress/Compressor.output')
+f(3,4,1,1,'spec/benchmarks/compress/Decompressor$DeStack.push')
+f(3,5,3,1,'spec/benchmarks/compress/InputBuffer.readBytes')
+f(2,8,5355,1,'spec/harness/BenchmarkThread.run')
+f(3,8,5355,1,'spec/harness/BenchmarkThread.executeIteration')
+f(4,8,5355,1,'spec/harness/BenchmarkThread.runLoop')
+f(5,8,5354,1,'spec/benchmarks/compress/Main.harnessMain')
+f(6,8,5354,1,'spec/benchmarks/compress/Main.runBenchmark')
+f(7,8,5354,1,'spec/benchmarks/compress/Harness.inst_main')
+f(8,8,5354,1,'spec/benchmarks/compress/Harness.runCompress',0,0,1)
+f(9,9,3,1,'java/io/PrintStream.print')
+f(10,9,3,1,'java/io/PrintStream.write',0,0,1)
+f(11,10,2,1,'java/io/PrintStream.implWrite')
+f(12,10,1,1,'java/io/BufferedWriter.flushBuffer')
+f(13,10,1,1,'java/io/BufferedWriter.implFlushBuffer')
+f(14,10,1,1,'java/io/OutputStreamWriter.write')
+f(15,10,1,1,'sun/nio/cs/StreamEncoder.write')
+f(16,10,1,1,'jdk/internal/misc/InternalLock.unlock')
+f(17,10,1,1,'java/util/concurrent/locks/ReentrantLock.unlock')
+f(18,10,1,1,'java/util/concurrent/locks/AbstractQueuedSynchronizer.release')
+f(19,10,1,1,'java/util/concurrent/locks/AbstractQueuedSynchronizer.signalNext')
+f(20,10,1,4,'Runtime1::counter_overflow(JavaThread*, int, Method*)')
+f(21,10,1,4,'Continuation::is_return_barrier_entry(unsigned char*)')
+f(12,11,1,1,'java/io/OutputStreamWriter.flushBuffer')
+f(13,11,1,1,'sun/nio/cs/StreamEncoder.flushBuffer')
+f(14,11,1,1,'sun/nio/cs/StreamEncoder.lockedFlushBuffer')
+f(15,11,1,1,'sun/nio/cs/StreamEncoder.implFlushBuffer')
+f(16,11,1,1,'sun/nio/cs/StreamEncoder.writeBytes')
+f(17,11,1,2,'java/nio/ByteBuffer.array',1,0,0)
+f(9,12,5328,1,'spec/benchmarks/compress/Compress.performAction')
+f(10,12,31,1,'spec/benchmarks/compress/Compressor.<init>')
+f(11,12,8,2,'spec/benchmarks/compress/CodeTable.<init>',8,0,0)
+f(12,15,5,5,'asm_exc_page_fault')
+f(13,15,5,5,'exc_page_fault')
+f(14,15,5,5,'do_user_addr_fault')
+f(15,18,2,5,'handle_mm_fault')
+f(16,18,2,5,'__handle_mm_fault')
+f(17,18,1,5,'_raw_spin_lock')
+f(17,19,1,5,'do_anonymous_page')
+f(18,19,1,5,'__mem_cgroup_charge')
+f(19,19,1,5,'charge_memcg')
+f(11,20,23,2,'spec/benchmarks/compress/Compressor$HashTable.<init>',15,0,8)
+f(12,26,8,4,'InterpreterRuntime::newarray(JavaThread*, BasicType, int)')
+f(13,26,8,4,'TypeArrayKlass::allocate_common(int, bool, JavaThread*)')
+f(14,26,8,4,'MemAllocator::allocate() const')
+f(15,26,8,3,'__memset_avx2_erms')
+f(16,27,7,5,'asm_exc_page_fault')
+f(17,27,7,5,'exc_page_fault')
+f(18,27,7,5,'do_user_addr_fault')
+f(19,28,1,5,'down_read_trylock')
+f(19,29,5,5,'handle_mm_fault')
+f(20,29,5,5,'__handle_mm_fault')
+f(21,30,3,5,'do_anonymous_page')
+f(22,30,1,5,'__mem_cgroup_charge')
+f(23,30,1,5,'charge_memcg')
+f(24,30,1,5,'try_charge_memcg')
+f(25,30,1,5,'page_counter_try_charge')
+f(22,31,2,5,'alloc_pages_vma')
+f(23,31,2,5,'__alloc_pages')
+f(24,31,2,5,'get_page_from_freelist')
+f(25,31,2,5,'prep_new_page')
+f(26,31,2,5,'clear_page_erms')
+f(21,33,1,5,'pmd_page_vaddr')
+f(12,34,9,5,'asm_exc_page_fault')
+f(13,34,9,5,'exc_page_fault')
+f(14,34,9,5,'do_user_addr_fault')
+f(15,37,6,5,'handle_mm_fault')
+f(16,37,5,5,'__handle_mm_fault')
+f(17,39,3,5,'do_anonymous_page')
+f(18,39,2,5,'alloc_pages_vma')
+f(19,40,1,5,'__alloc_pages')
+f(20,40,1,5,'get_page_from_freelist')
+f(21,40,1,5,'rmqueue')
+f(18,41,1,5,'page_add_new_anon_rmap')
+f(19,41,1,5,'__mod_lruvec_page_state')
+f(20,41,1,5,'__mod_lruvec_state')
+f(21,41,1,5,'__mod_node_page_state')
+f(16,42,1,5,'pud_offset.isra.0')
+f(10,43,3849,1,'spec/benchmarks/compress/Compressor.compress',0,0,1)
+f(11,2675,2,5,'asm_common_interrupt')
+f(12,2675,2,5,'common_interrupt')
+f(13,2675,2,5,'irq_exit_rcu')
+f(14,2675,2,5,'__softirqentry_text_start')
+f(11,2677,1,5,'asm_sysvec_irq_work')
+f(12,2677,1,5,'sysvec_irq_work')
+f(13,2677,1,5,'irqentry_exit')
+f(14,2677,1,5,'irqentry_exit_to_user_mode')
+f(15,2677,1,5,'exit_to_user_mode_prepare')
+f(11,2678,314,2,'spec/benchmarks/compress/CodeTable.of',314,0,0)
+f(11,2992,66,2,'spec/benchmarks/compress/CodeTable.set',66,0,0)
+f(11,3058,5,2,'spec/benchmarks/compress/Compressor$HashTable.clear',5,0,0)
+f(11,3063,141,2,'spec/benchmarks/compress/Compressor$HashTable.of',141,0,0)
+f(11,3204,55,2,'spec/benchmarks/compress/Compressor$HashTable.set',55,0,0)
+f(11,3259,13,1,'spec/benchmarks/compress/Compressor.clBlock')
+f(12,3259,13,1,'spec/benchmarks/compress/Compressor$HashTable.clear')
+f(11,3272,452,1,'spec/benchmarks/compress/Compressor.output')
+f(12,3667,57,2,'spec/benchmarks/compress/OutputBuffer.writeByte',57,0,0)
+f(13,3723,1,5,'asm_common_interrupt')
+f(14,3723,1,5,'common_interrupt')
+f(15,3723,1,5,'irq_exit_rcu')
+f(16,3723,1,5,'__softirqentry_text_start')
+f(17,3723,1,5,'tasklet_hi_action')
+f(18,3723,1,5,'tasklet_action_common.isra.0')
+f(19,3723,1,5,'execlists_submission_tasklet?[i915]')
+f(20,3723,1,5,'process_csb?[i915]')
+f(11,3724,168,2,'spec/benchmarks/compress/InputBuffer.readByte',168,0,0)
+f(12,3890,2,5,'asm_sysvec_irq_work')
+f(13,3890,2,5,'sysvec_irq_work')
+f(14,3890,2,5,'irqentry_exit')
+f(15,3890,2,5,'irqentry_exit_to_user_mode')
+f(16,3890,2,5,'exit_to_user_mode_prepare')
+f(10,3892,8,1,'spec/benchmarks/compress/Decompressor.<init>')
+f(11,3892,1,4,'Runtime1::new_type_array(JavaThread*, Klass*, int)')
+f(12,3892,1,4,'TypeArrayKlass::allocate_common(int, bool, JavaThread*)')
+f(13,3892,1,4,'MemAllocator::allocate() const')
+f(14,3892,1,3,'__memset_avx2_erms')
+f(15,3892,1,5,'asm_exc_page_fault')
+f(16,3892,1,5,'exc_page_fault')
+f(17,3892,1,5,'do_user_addr_fault')
+f(18,3892,1,5,'handle_mm_fault')
+f(19,3892,1,5,'__handle_mm_fault')
+f(20,3892,1,5,'do_anonymous_page')
+f(21,3892,1,5,'alloc_pages_vma')
+f(22,3892,1,5,'__alloc_pages')
+f(23,3892,1,5,'get_page_from_freelist')
+f(24,3892,1,5,'rmqueue')
+f(11,3893,7,2,'spec/benchmarks/compress/CodeTable.<init>',5,0,1)
+f(12,3897,1,4,'InterpreterRuntime::newarray(JavaThread*, BasicType, int)')
+f(13,3897,1,4,'TypeArrayKlass::allocate_common(int, bool, JavaThread*)')
+f(14,3897,1,4,'MemAllocator::allocate() const')
+f(15,3897,1,3,'__memset_avx2_erms')
+f(16,3897,1,5,'asm_exc_page_fault')
+f(17,3897,1,5,'exc_page_fault')
+f(18,3897,1,5,'do_user_addr_fault')
+f(12,3898,2,5,'asm_exc_page_fault')
+f(13,3898,2,5,'exc_page_fault')
+f(14,3898,2,5,'do_user_addr_fault')
+f(15,3899,1,5,'handle_mm_fault')
+f(16,3899,1,5,'__handle_mm_fault')
+f(17,3899,1,5,'do_anonymous_page')
+f(18,3899,1,5,'__mem_cgroup_charge')
+f(19,3899,1,5,'charge_memcg')
+f(20,3899,1,5,'try_charge_memcg')
+f(10,3900,1440,1,'spec/benchmarks/compress/Decompressor.decompress',0,0,1)
+f(11,4459,40,2,'spec/benchmarks/compress/CodeTable.clear',40,0,0)
+f(11,4499,25,2,'spec/benchmarks/compress/CodeTable.of',25,0,0)
+f(11,4524,20,2,'spec/benchmarks/compress/CodeTable.set',20,0,0)
+f(11,4544,1,2,'spec/benchmarks/compress/Decompressor$DeStack.isEmpty',1,0,0)
+f(11,4545,68,2,'spec/benchmarks/compress/Decompressor$DeStack.pop',68,0,0)
+f(12,4612,1,5,'asm_sysvec_irq_work')
+f(13,4612,1,5,'sysvec_irq_work')
+f(14,4612,1,5,'irqentry_exit')
+f(15,4612,1,5,'irqentry_exit_to_user_mode')
+f(16,4612,1,5,'exit_to_user_mode_prepare')
+f(11,4613,212,2,'spec/benchmarks/compress/Decompressor$DeStack.push',212,0,0)
+f(12,4824,1,5,'asm_sysvec_irq_work')
+f(13,4824,1,5,'sysvec_irq_work')
+f(14,4824,1,5,'irqentry_exit')
+f(15,4824,1,5,'irqentry_exit_to_user_mode')
+f(16,4824,1,5,'exit_to_user_mode_prepare')
+f(17,4824,1,5,'schedule')
+f(18,4824,1,5,'__schedule')
+f(19,4824,1,5,'finish_task_switch')
+f(20,4824,1,5,'asm_common_interrupt')
+f(21,4824,1,5,'common_interrupt')
+f(22,4824,1,5,'irq_exit_rcu')
+f(23,4824,1,5,'__softirqentry_text_start')
+f(24,4824,1,5,'tasklet_hi_action')
+f(25,4824,1,5,'tasklet_action_common.isra.0')
+f(26,4824,1,5,'execlists_submission_tasklet?[i915]')
+f(27,4824,1,5,'__execlists_schedule_out?[i915]')
+f(28,4824,1,5,'intel_engine_add_retire?[i915]')
+f(29,4824,1,5,'queue_work_on')
+f(11,4825,86,2,'spec/benchmarks/compress/Decompressor$SuffixTable.of',86,0,0)
+f(11,4911,6,2,'spec/benchmarks/compress/Decompressor$SuffixTable.set',6,0,0)
+f(11,4917,308,2,'spec/benchmarks/compress/Decompressor.getCode',197,0,0)
+f(12,5114,111,1,'spec/benchmarks/compress/InputBuffer.readBytes')
+f(11,5225,115,2,'spec/benchmarks/compress/OutputBuffer.writeByte',115,0,0)
+f(9,5340,22,1,'spec/benchmarks/compress/OutputBuffer.getCRC')
+f(10,5340,22,1,'java/util/zip/CRC32.update')
+f(11,5340,22,2,'java/util/zip/CRC32.updateBytes',21,0,1)
+f(12,5340,22,3,'updateBytesCRC32')
+f(5,5362,1,1,'spec/io/ValidityCheckOutputStream.validityCheck')
+f(6,5362,1,1,'spec/io/ValidityCheckOutputStream.validityCheck2')
+f(7,5362,1,0,'java/io/BufferedReader.close',0,0,1)
+f(1,5363,14,3,'[C1 CompilerThre tid=520997]')
+f(2,5363,1,3,'[unknown]')
+f(3,5363,1,3,'__GI__IO_file_doallocate')
+f(2,5364,13,3,'start_thread')
+f(3,5364,13,3,'thread_native_entry(Thread*)')
+f(4,5364,13,4,'Thread::call_run()')
+f(5,5364,13,4,'JavaThread::thread_main_inner() [clone .part.0]')
+f(6,5364,13,4,'CompileBroker::compiler_thread_loop()')
+f(7,5364,13,4,'CompileBroker::invoke_compiler_on_method(CompileTask*)')
+f(8,5364,13,4,'Compiler::compile_method(ciEnv*, ciMethod*, int, bool, DirectiveSet*)')
+f(9,5364,13,4,'Compilation::Compilation(AbstractCompiler*, ciEnv*, ciMethod*, int, BufferBlob*, bool, DirectiveSet*)')
+f(10,5364,13,4,'Compilation::compile_method()')
+f(11,5364,12,4,'Compilation::compile_java_method()')
+f(12,5364,4,4,'Compilation::build_hir() [clone .part.0]')
+f(13,5364,3,4,'IR::IR(Compilation*, ciMethod*, int)')
+f(14,5364,3,4,'IRScope::IRScope(Compilation*, IRScope*, int, ciMethod*, int, bool)')
+f(15,5364,3,4,'GraphBuilder::GraphBuilder(Compilation*, IRScope*)')
+f(16,5364,3,4,'GraphBuilder::iterate_all_blocks(bool)')
+f(17,5364,3,4,'GraphBuilder::iterate_bytecodes_for_block(int)')
+f(18,5364,1,4,'GraphBuilder::if_zero(ValueType*, Instruction::Condition)')
+f(19,5364,1,4,'Constant::visit(InstructionVisitor*)')
+f(18,5365,2,4,'GraphBuilder::invoke(Bytecodes::Code)')
+f(19,5365,2,4,'GraphBuilder::try_inline(ciMethod*, bool, bool, Bytecodes::Code, Instruction*)')
+f(20,5365,2,4,'GraphBuilder::try_inline_full(ciMethod*, bool, bool, Bytecodes::Code, Instruction*)')
+f(21,5365,1,4,'GraphBuilder::iterate_all_blocks(bool)')
+f(22,5365,1,4,'GraphBuilder::iterate_bytecodes_for_block(int)')
+f(23,5365,1,4,'GraphBuilder::invoke(Bytecodes::Code)')
+f(21,5366,1,4,'GraphBuilder::push_scope(ciMethod*, BlockBegin*)')
+f(22,5366,1,4,'BlockListBuilder::BlockListBuilder(Compilation*, IRScope*, int)')
+f(23,5366,1,4,'BlockListBuilder::set_leaders()')
+f(24,5366,1,4,'ciMethod::bci_block_start()')
+f(25,5366,1,4,'MethodLiveness::compute_liveness()')
+f(26,5366,1,4,'MethodLiveness::init_basic_blocks()')
+f(27,5366,1,4,'ciMethod::get_method_blocks()')
+f(28,5366,1,4,'ciMethodBlocks::ciMethodBlocks(Arena*, ciMethod*)')
+f(29,5366,1,4,'ciMethodBlocks::do_analysis()')
+f(13,5367,1,4,'IR::compute_use_counts()')
+f(14,5367,1,4,'BlockList::iterate_backward(BlockClosure*)')
+f(15,5367,1,4,'Invoke::input_values_do(ValueVisitor*)')
+f(12,5368,4,4,'Compilation::emit_code_body()')
+f(13,5368,2,4,'LIR_Assembler::emit_code(BlockList*)')
+f(14,5368,2,4,'LIR_Assembler::emit_lir_list(LIR_List*)')
+f(15,5368,2,4,'LIR_Assembler::emit_op1(LIR_Op1*)')
+f(16,5368,1,4,'LIR_Assembler::const2reg(LIR_Opr, LIR_Opr, LIR_PatchCode, CodeEmitInfo*)')
+f(17,5368,1,4,'MacroAssembler::mov_metadata(Register, Metadata*)')
+f(18,5368,1,4,'Assembler::mov_literal64(Register, long, RelocationHolder const&)')
+f(16,5369,1,4,'MacroAssembler::mov_metadata(Register, Metadata*)')
+f(13,5370,2,4,'LIR_Assembler::emit_slow_case_stubs()')
+f(14,5370,2,4,'CounterOverflowStub::emit_code(LIR_Assembler*)')
+f(15,5370,2,4,'LIR_Assembler::add_call_info(int, CodeEmitInfo*)')
+f(16,5371,1,4,'CodeEmitInfo::record_debug_info(DebugInformationRecorder*, int)')
+f(17,5371,1,4,'DebugInformationRecorder::describe_scope(int, methodHandle const&, ciMethod*, int, bool, bool, bool, bool, bool, bool, DebugToken*, DebugToken*, DebugToken*)')
+f(12,5372,3,4,'Compilation::emit_lir()')
+f(13,5372,1,4,'BlockList::iterate_forward(BlockClosure*)')
+f(14,5372,1,4,'non-virtual thunk to LIRGenerator::block_do(BlockBegin*)')
+f(15,5372,1,4,'LIRGenerator::do_Base(Base*)')
+f(13,5373,2,4,'LinearScan::do_linear_scan()')
+f(14,5373,2,4,'LinearScan::build_intervals()')
+f(15,5374,1,4,'LIR_OpVisitState::visit(LIR_Op*)')
+f(12,5375,1,3,'__tls_get_addr@plt')
+f(11,5376,1,4,'Compilation::install_code(int)')
+f(12,5376,1,4,'ciEnv::register_method(ciMethod*, int, CodeOffsets*, int, CodeBuffer*, int, OopMapSet*, ExceptionHandlerTable*, ImplicitExceptionTable*, AbstractCompiler*, bool, bool, bool, int, RTMState)')
+f(13,5376,1,4,'nmethod::post_compiled_method(CompileTask*)')
+f(1,5377,46,3,'[C2 CompilerThre tid=520996]')
+f(2,5377,1,3,'[unknown]')
+f(3,5377,1,3,'pthread_cond_timedwait@@GLIBC_2.3.2')
+f(4,5377,1,5,'entry_SYSCALL_64_after_hwframe')
+f(5,5377,1,5,'do_syscall_64')
+f(6,5377,1,5,'__x64_sys_futex')
+f(7,5377,1,5,'do_futex')
+f(8,5377,1,5,'futex_wait')
+f(9,5377,1,5,'futex_wait_setup')
+f(2,5378,1,3,'__memmove_avx_unaligned_erms')
+f(2,5379,44,3,'start_thread')
+f(3,5379,44,3,'thread_native_entry(Thread*)')
+f(4,5379,44,4,'Thread::call_run()')
+f(5,5379,44,4,'JavaThread::thread_main_inner() [clone .part.0]')
+f(6,5379,44,4,'CompileBroker::compiler_thread_loop()')
+f(7,5379,44,4,'CompileBroker::invoke_compiler_on_method(CompileTask*)')
+f(8,5379,44,4,'C2Compiler::compile_method(ciEnv*, ciMethod*, int, bool, DirectiveSet*)')
+f(9,5379,44,4,'Compile::Compile(ciEnv*, ciMethod*, int, Options, DirectiveSet*)')
+f(10,5379,19,4,'Compile::Code_Gen()')
+f(11,5379,1,4,'Matcher::find_shared(Node*)')
+f(11,5380,2,4,'Matcher::match()')
+f(12,5380,2,4,'Matcher::xform(Node*, int)')
+f(13,5380,2,4,'Matcher::match_tree(Node const*)')
+f(14,5380,2,4,'Matcher::Label_Root(Node const*, State*, Node*, Node*&)')
+f(15,5380,2,4,'Matcher::Label_Root(Node const*, State*, Node*, Node*&)')
+f(16,5380,1,4,'Arena::grow(unsigned long, AllocFailStrategy::AllocFailEnum)')
+f(16,5381,1,4,'Matcher::Label_Root(Node const*, State*, Node*, Node*&)')
+f(17,5381,1,4,'State::DFA(int, Node const*)')
+f(18,5381,1,4,'Node::find_long_type() const')
+f(11,5382,4,4,'PhaseCFG::do_global_code_motion()')
+f(12,5382,4,4,'PhaseCFG::global_code_motion()')
+f(13,5382,2,4,'PhaseCFG::implicit_null_check(Block*, Node*, Node*, int)')
+f(14,5383,1,4,'PhaseCFG::insert_anti_dependences(Block*, Node*, bool)')
+f(15,5383,1,4,'MachNode::adr_type() const')
+f(16,5383,1,4,'TypeInstPtr::add_offset(long) const')
+f(13,5384,1,4,'PhaseCFG::schedule_late(VectorSet&, Node_Stack&)')
+f(14,5384,1,3,'__memset_avx2_unaligned_erms')
+f(13,5385,1,4,'PhaseCFG::schedule_pinned_nodes(VectorSet&)')
+f(11,5386,9,4,'PhaseChaitin::Register_Allocate()')
+f(12,5386,1,4,'PhaseChaitin::Simplify()')
+f(12,5387,2,4,'PhaseChaitin::build_ifg_physical(ResourceArea*)')
+f(13,5387,1,4,'PhaseChaitin::add_input_to_liveout(Block*, Node*, IndexSet*, double, PhaseChaitin::Pressure&, PhaseChaitin::Pressure&)')
+f(14,5387,1,3,'__tls_get_addr')
+f(13,5388,1,4,'PhaseChaitin::compute_initial_block_pressure(Block*, IndexSet*, PhaseChaitin::Pressure&, PhaseChaitin::Pressure&, double) [clone .part.0]')
+f(12,5389,1,4,'PhaseChaitin::merge_multidefs()')
+f(12,5390,3,4,'PhaseChaitin::post_allocate_copy_removal()')
+f(13,5392,1,4,'PhaseChaitin::elide_copy(Node*, int, Block*, Node_List*, Node_List*, bool)')
+f(12,5393,1,4,'PhaseIFG::SquareUp()')
+f(12,5394,1,4,'PhaseLive::compute(unsigned int)')
+f(13,5394,1,4,'PhaseLive::add_liveout(Block_List&, Block*, IndexSet*, VectorSet&)')
+f(11,5395,2,4,'PhaseOutput::Output()')
+f(12,5395,2,4,'PhaseOutput::BuildOopMaps()')
+f(11,5397,1,4,'PhasePeephole::do_transform()')
+f(10,5398,20,4,'Compile::Optimize()')
+f(11,5398,1,4,'PhaseCCP::analyze()')
+f(12,5398,1,4,'PhaseCCP::push_more_uses(Unique_Node_List&, Node*, Node const*) const')
+f(13,5398,1,4,'HaltNode::Opcode() const')
+f(11,5399,1,4,'PhaseCCP::do_transform()')
+f(12,5399,1,4,'PhaseCCP::transform(Node*) [clone .part.0]')
+f(13,5399,1,4,'PhaseCCP::transform_once(Node*)')
+f(14,5399,1,4,'TypeAryPtr::add_offset(long) const')
+f(15,5399,1,4,'TypeAryPtr::make(TypePtr::PTR, ciObject*, TypeAry const*, ciKlass*, bool, int, int, TypePtr const*, int, bool) [clone .constprop.0]')
+f(11,5400,1,4,'PhaseIdealLoop::build_and_optimize()')
+f(12,5400,1,4,'PhaseIdealLoop::build_loop_early(VectorSet&, Node_List&, Node_Stack&)')
+f(11,5401,11,4,'PhaseIdealLoop::optimize(PhaseIterGVN&, LoopOptsMode)')
+f(12,5401,10,4,'PhaseIdealLoop::build_and_optimize()')
+f(13,5401,1,4,'PhaseIdealLoop::Dominators()')
+f(13,5402,2,4,'PhaseIdealLoop::build_loop_early(VectorSet&, Node_List&, Node_Stack&)')
+f(14,5403,1,4,'PhaseIdealLoop::get_early_ctrl(Node*)')
+f(15,5403,1,4,'PhaseIdealLoop::get_ctrl(Node const*)')
+f(13,5404,3,4,'PhaseIdealLoop::build_loop_late(VectorSet&, Node_List&, Node_Stack&)')
+f(14,5405,2,4,'PhaseIdealLoop::build_loop_late_post_work(Node*, bool)')
+f(15,5405,2,4,'PhaseIdealLoop::get_late_ctrl_with_anti_dep(LoadNode*, Node*, Node*)')
+f(16,5406,1,4,'PhaseIdealLoop::is_dominator(Node*, Node*)')
+f(13,5407,2,4,'PhaseIdealLoop::build_loop_tree()')
+f(14,5407,1,4,'MultiNode::is_CFG() const')
+f(14,5408,1,4,'PhaseIdealLoop::build_loop_tree_impl(Node*, int)')
+f(13,5409,1,4,'PhaseIdealLoop::split_if_with_blocks(VectorSet&, Node_Stack&)')
+f(14,5409,1,4,'CmpINode::Opcode() const')
+f(13,5410,1,4,'ProjNode::is_CFG() const')
+f(12,5411,1,4,'PhaseIterGVN::optimize()')
+f(13,5411,1,4,'PhaseIterGVN::transform_old(Node*)')
+f(14,5411,1,4,'PhiNode::hash() const')
+f(15,5411,1,4,'TypeInt::hash() const')
+f(11,5412,6,4,'PhaseIterGVN::optimize()')
+f(12,5413,5,4,'PhaseIterGVN::transform_old(Node*)')
+f(13,5414,1,4,'CastIINode::Value(PhaseGVN*) const')
+f(14,5414,1,4,'Type::hashcons()')
+f(15,5414,1,4,'Dict::Insert(void*, void*, bool)')
+f(16,5414,1,4,'Type::cmp(Type const*, Type const*)')
+f(13,5415,1,4,'PhaseIterGVN::add_users_to_worklist(Node*)')
+f(13,5416,1,4,'PhaseIterGVN::subsume_node(Node*, Node*)')
+f(13,5417,1,4,'PhiNode::hash() const')
+f(14,5417,1,4,'TypeInt::hash() const')
+f(10,5418,5,4,'ParseGenerator::generate(JVMState*)')
+f(11,5418,5,4,'Parse::Parse(JVMState*, ciMethod*, float)')
+f(12,5418,4,4,'Parse::do_all_blocks()')
+f(13,5418,4,4,'Parse::do_one_block()')
+f(14,5418,4,4,'Parse::do_one_bytecode()')
+f(15,5418,3,4,'Parse::do_call()')
+f(16,5418,1,4,'Compile::call_generator(ciMethod*, int, bool, JVMState*, bool, float, ciKlass*, bool)')
+f(17,5418,1,4,'InlineTree::ok_to_inline(ciMethod*, JVMState*, ciCallProfile&, bool&)')
+f(18,5418,1,4,'InlineTree::try_to_inline(ciMethod*, ciMethod*, int, JVMState*, ciCallProfile&, bool&)')
+f(19,5418,1,4,'InlineTree::should_not_inline(ciMethod*, ciMethod*, int, bool&, ciCallProfile&)')
+f(20,5418,1,4,'ciMethod::has_compiled_code()')
+f(16,5419,1,4,'GraphKit::kill_dead_locals()')
+f(17,5419,1,4,'ciMethod::liveness_at_bci(int)')
+f(18,5419,1,4,'MethodLiveness::get_liveness_at(int)')
+f(16,5420,1,4,'PredictedCallGenerator::generate(JVMState*)')
+f(17,5420,1,4,'PredictedCallGenerator::generate(JVMState*)')
+f(18,5420,1,4,'ParseGenerator::generate(JVMState*)')
+f(19,5420,1,4,'Parse::Parse(JVMState*, ciMethod*, float)')
+f(20,5420,1,4,'Parse::do_all_blocks()')
+f(21,5420,1,4,'Parse::do_one_block()')
+f(22,5420,1,4,'Parse::do_one_bytecode()')
+f(23,5420,1,4,'Parse::do_call()')
+f(24,5420,1,4,'PredictedCallGenerator::generate(JVMState*)')
+f(25,5420,1,4,'ParseGenerator::generate(JVMState*)')
+f(26,5420,1,4,'Parse::Parse(JVMState*, ciMethod*, float)')
+f(27,5420,1,4,'Parse::do_all_blocks()')
+f(28,5420,1,4,'Parse::do_one_block()')
+f(29,5420,1,4,'Parse::do_one_bytecode()')
+f(30,5420,1,4,'Parse::do_call()')
+f(31,5420,1,4,'PredictedCallGenerator::generate(JVMState*)')
+f(32,5420,1,4,'ParseGenerator::generate(JVMState*)')
+f(33,5420,1,4,'Parse::Parse(JVMState*, ciMethod*, float)')
+f(34,5420,1,4,'Parse::do_all_blocks()')
+f(35,5420,1,4,'Parse::do_one_block()')
+f(36,5420,1,4,'Parse::do_one_bytecode()')
+f(37,5420,1,4,'Parse::do_field_access(bool, bool)')
+f(38,5420,1,4,'Parse::do_get_xxx(Node*, ciField*, bool)')
+f(39,5420,1,4,'Compile::alias_type(ciField*)')
+f(40,5420,1,4,'TypeOopPtr::make_from_klass_common(ciKlass*, bool, bool, Type::InterfaceHandling)')
+f(15,5421,1,4,'Parse::do_field_access(bool, bool)')
+f(16,5421,1,4,'PhaseGVN::transform_no_reclaim(Node*)')
+f(12,5422,1,4,'Parse::load_interpreter_state(Node*)')
+f(13,5422,1,4,'Parse::check_interpreter_type(Node*, Type const*, SafePointNode*&)')
+f(14,5422,1,4,'TypeInstPtr::is_same_java_type_as_helper(TypeOopPtr const*) const')
+f(1,5423,17,3,'[DestroyJavaVM tid=520989]')
+f(2,5423,7,1,'spec/harness/Launch.main',0,0,1)
+f(3,5423,1,4,'InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code)')
+f(4,5423,1,4,'InterpreterRuntime::resolve_invoke(JavaThread*, Bytecodes::Code)')
+f(5,5423,1,4,'LinkResolver::resolve_invoke(CallInfo&, Handle, constantPoolHandle const&, int, Bytecodes::Code, JavaThread*)')
+f(6,5423,1,4,'LinkResolver::resolve_static_call(CallInfo&, LinkInfo const&, bool, JavaThread*)')
+f(7,5423,1,4,'InstanceKlass::initialize_impl(JavaThread*)')
+f(8,5423,1,4,'InstanceKlass::link_class_impl(JavaThread*)')
+f(9,5423,1,4,'Verifier::verify(InstanceKlass*, bool, JavaThread*)')
+f(10,5423,1,4,'Verifier::inference_verify(InstanceKlass*, char*, unsigned long, JavaThread*)')
+f(11,5423,1,3,'VerifyClassForMajorVersion')
+f(12,5423,1,3,'set_protected')
+f(13,5423,1,3,'cp_index_to_class_fullinfo')
+f(14,5423,1,4,'oopDesc::metadata_field(int) const')
+f(3,5424,6,1,'spec/harness/Launch.runBenchmarkSuite')
+f(4,5424,4,1,'spec/harness/Configuration.setupReportInfo')
+f(5,5424,4,1,'java/util/Date.toString')
+f(6,5424,1,1,'java/util/Date.normalize')
+f(7,5424,1,1,'java/util/TimeZone.getDefaultRef')
+f(8,5424,1,1,'java/util/TimeZone.setDefaultZone')
+f(9,5424,1,1,'java/util/TimeZone.getTimeZone')
+f(10,5424,1,1,'sun/util/calendar/ZoneInfo.getTimeZone')
+f(11,5424,1,1,'sun/util/calendar/ZoneInfoFile.<clinit>')
+f(12,5424,1,0,'sun/util/calendar/ZoneInfoFile.loadTZDB',0,0,1)
+f(13,5424,1,4,'InterpreterRuntime::_new(JavaThread*, ConstantPool*, int)')
+f(14,5424,1,4,'InstanceKlass::initialize_impl(JavaThread*)')
+f(15,5424,1,4,'InstanceKlass::link_class_impl(JavaThread*)')
+f(16,5424,1,4,'klassItable::initialize_itable_and_check_constraints(JavaThread*)')
+f(17,5424,1,4,'klassItable::check_constraints(GrowableArray<Method*>*, JavaThread*)')
+f(6,5425,3,1,'java/util/TimeZone.getDisplayName')
+f(7,5425,3,1,'sun/util/locale/provider/TimeZoneNameUtility.retrieveDisplayName')
+f(8,5425,3,1,'sun/util/locale/provider/TimeZoneNameUtility.retrieveDisplayNamesImpl')
+f(9,5425,3,1,'sun/util/locale/provider/LocaleServiceProviderPool.getLocalizedObject')
+f(10,5425,3,1,'sun/util/locale/provider/LocaleServiceProviderPool.getLocalizedObjectImpl')
+f(11,5425,3,1,'sun/util/locale/provider/TimeZoneNameUtility$TimeZoneNameGetter.getObject')
+f(12,5425,3,1,'sun/util/locale/provider/TimeZoneNameUtility$TimeZoneNameGetter.getObject')
+f(13,5425,3,1,'sun/util/locale/provider/TimeZoneNameUtility$TimeZoneNameGetter.getName')
+f(14,5425,3,1,'sun/util/locale/provider/TimeZoneNameProviderImpl.getDisplayName')
+f(15,5425,3,1,'sun/util/cldr/CLDRTimeZoneNameProviderImpl.getDisplayNameArray')
+f(16,5425,2,1,'java/util/TimeZone.toZoneId')
+f(17,5425,2,1,'java/util/TimeZone.toZoneId0')
+f(18,5425,2,1,'java/util/TimeZone.toZoneId')
+f(19,5425,2,1,'java/util/TimeZone.toZoneId0')
+f(20,5425,2,1,'java/time/ZoneId.of')
+f(21,5425,2,1,'java/time/ZoneId.of')
+f(22,5425,2,1,'java/time/ZoneId.of')
+f(23,5425,2,1,'java/time/ZoneRegion.ofId')
+f(24,5425,2,1,'java/time/zone/ZoneRulesProvider.<clinit>')
+f(25,5425,1,1,'java/security/AccessController.doPrivileged')
+f(26,5425,1,1,'java/security/AccessController.executePrivileged')
+f(27,5425,1,1,'java/time/zone/ZoneRulesProvider$1.run')
+f(28,5425,1,1,'java/time/zone/ZoneRulesProvider$1.run')
+f(29,5425,1,1,'java/time/zone/TzdbZoneRulesProvider.<init>')
+f(30,5425,1,1,'java/time/zone/TzdbZoneRulesProvider.load')
+f(31,5425,1,1,'java/io/DataInputStream.readShort')
+f(32,5425,1,2,'jdk/internal/util/ByteArray.getShort',1,0,0)
+f(33,5425,1,2,'java/lang/invoke/VarHandleGuards.guard_LI_I',1,0,0)
+f(34,5425,1,2,'java/lang/invoke/VarHandleByteArrayAsShorts$ArrayHandle.get',1,0,0)
+f(35,5425,1,2,'java/lang/invoke/VarHandleByteArrayAsShorts$ArrayHandle.index',1,0,0)
+f(25,5426,1,1,'java/util/ServiceLoader$3.hasNext')
+f(26,5426,1,1,'java/util/ServiceLoader$2.hasNext')
+f(27,5426,1,1,'java/util/ServiceLoader$LazyClassPathLookupIterator.hasNext')
+f(28,5426,1,1,'java/util/ServiceLoader$LazyClassPathLookupIterator.hasNextService')
+f(29,5426,1,1,'java/util/ServiceLoader$LazyClassPathLookupIterator.nextProviderClass')
+f(30,5426,1,1,'java/lang/CompoundEnumeration.hasMoreElements')
+f(31,5426,1,1,'java/lang/CompoundEnumeration.next')
+f(32,5426,1,1,'jdk/internal/loader/BuiltinClassLoader$1.hasMoreElements')
+f(33,5426,1,1,'jdk/internal/loader/BuiltinClassLoader$1.hasNext')
+f(34,5426,1,1,'jdk/internal/loader/URLClassPath$1.hasMoreElements')
+f(35,5426,1,1,'jdk/internal/loader/URLClassPath$1.next')
+f(36,5426,1,1,'jdk/internal/loader/URLClassPath.getLoader')
+f(37,5426,1,1,'jdk/internal/loader/URLClassPath.getLoader')
+f(38,5426,1,1,'java/security/AccessController.doPrivileged')
+f(39,5426,1,1,'java/security/AccessController.executePrivileged')
+f(40,5426,1,1,'jdk/internal/loader/URLClassPath$3.run')
+f(41,5426,1,1,'jdk/internal/loader/URLClassPath$3.run')
+f(42,5426,1,1,'jdk/internal/loader/URLClassPath$JarLoader.<init>')
+f(43,5426,1,1,'jdk/internal/loader/URLClassPath$JarLoader.newURL')
+f(44,5426,1,1,'java/net/URL.<init>')
+f(45,5426,1,1,'java/lang/String.indexOf')
+f(46,5426,1,1,'java/lang/String.indexOf')
+f(47,5426,1,2,'java/lang/StringLatin1.indexOf',1,0,0)
+f(48,5426,1,2,'java/lang/StringLatin1.canEncode',1,0,0)
+f(16,5427,1,1,'sun/util/cldr/CLDRTimeZoneNameProviderImpl.deriveFallbackName')
+f(17,5427,1,1,'sun/util/locale/provider/LocaleResources.getTimeZoneNames')
+f(18,5427,1,1,'sun/util/resources/LocaleData.getTimeZoneNames')
+f(19,5427,1,1,'sun/util/resources/LocaleData.getBundle')
+f(20,5427,1,1,'java/security/AccessController.doPrivileged')
+f(21,5427,1,1,'java/security/AccessController.executePrivileged')
+f(22,5427,1,1,'sun/util/resources/LocaleData$1.run')
+f(23,5427,1,1,'sun/util/resources/LocaleData$1.run')
+f(24,5427,1,1,'sun/util/resources/Bundles.of')
+f(25,5427,1,1,'sun/util/resources/Bundles.loadBundleOf')
+f(26,5427,1,1,'sun/util/resources/Bundles.findBundleOf')
+f(27,5427,1,1,'sun/util/resources/Bundles.findBundleOf')
+f(28,5427,1,1,'java/util/ResourceBundle$1.newResourceBundle')
+f(29,5427,1,1,'java/util/ResourceBundle$ResourceBundleProviderHelper.newResourceBundle')
+f(30,5427,1,1,'java/lang/Class.getConstructor')
+f(31,5427,1,1,'java/lang/Class.getConstructor0')
+f(32,5427,1,1,'java/lang/Class.privateGetDeclaredConstructors')
+f(33,5427,1,0,'java/lang/Class.getDeclaredConstructors0',0,0,1)
+f(34,5427,1,3,'JVM_GetClassDeclaredConstructors')
+f(35,5427,1,3,'get_class_declared_methods_helper(JNIEnv_*, _jclass*, unsigned char, bool, Klass*, JavaThread*) [clone .constprop.0]')
+f(36,5427,1,4,'InstanceKlass::link_class_impl(JavaThread*)')
+f(37,5427,1,4,'Rewriter::rewrite(InstanceKlass*, JavaThread*)')
+f(38,5427,1,4,'Rewriter::Rewriter(InstanceKlass*, constantPoolHandle const&, Array<Method*>*, JavaThread*)')
+f(39,5427,1,4,'Rewriter::rewrite_bytecodes(JavaThread*)')
+f(40,5427,1,4,'Rewriter::scan_method(Thread*, Method*, bool, bool*)')
+f(4,5428,2,1,'spec/harness/Launch.setupContext')
+f(5,5428,2,1,'spec/harness/results/TestResult.<clinit>')
+f(6,5428,2,1,'java/text/DecimalFormat.<init>')
+f(7,5428,2,1,'java/text/DecimalFormatSymbols.getInstance')
+f(8,5428,1,1,'sun/util/locale/provider/DecimalFormatSymbolsProviderImpl.getInstance')
+f(9,5428,1,1,'java/text/DecimalFormatSymbols.<init>')
+f(10,5428,1,1,'java/text/DecimalFormatSymbols.initialize')
+f(11,5428,1,1,'sun/util/locale/provider/LocaleResources.getDecimalFormatSymbolsData')
+f(12,5428,1,1,'sun/util/locale/provider/LocaleResources.getNumberStrings')
+f(13,5428,1,1,'java/util/ResourceBundle.containsKey')
+f(14,5428,1,1,'java/util/ListResourceBundle.handleKeySet')
+f(15,5428,1,1,'java/util/ListResourceBundle.loadLookup')
+f(16,5428,1,0,'sun/text/resources/cldr/FormatData.getContents',0,0,1)
+f(17,5428,1,4,'InterpreterRuntime::resolve_ldc(JavaThread*, Bytecodes::Code)')
+f(18,5428,1,4,'Bytecode_loadconstant::resolve_constant(JavaThread*) const')
+f(19,5428,1,4,'ConstantPool::resolve_constant_at_impl(constantPoolHandle const&, int, int, bool*, JavaThread*)')
+f(20,5428,1,4,'ConstantPool::string_at_impl(constantPoolHandle const&, int, int, JavaThread*)')
+f(21,5428,1,4,'StringTable::intern(Symbol*, JavaThread*)')
+f(22,5428,1,4,'StringTable::do_intern(Handle, unsigned short const*, int, unsigned long, JavaThread*)')
+f(23,5428,1,4,'java_lang_String::create_from_unicode(unsigned short const*, int, JavaThread*)')
+f(24,5428,1,4,'TypeArrayKlass::allocate_common(int, bool, JavaThread*)')
+f(25,5428,1,3,'__tls_get_addr')
+f(8,5429,1,1,'sun/util/locale/provider/LocaleProviderAdapter.getAdapter')
+f(9,5429,1,1,'sun/util/locale/provider/LocaleProviderAdapter.findAdapter')
+f(10,5429,1,1,'sun/util/locale/provider/JRELocaleProviderAdapter.getLocaleServiceProvider')
+f(11,5429,1,1,'java/lang/String.hashCode')
+f(12,5429,1,1,'java/lang/StringLatin1.hashCode')
+f(2,5430,10,1,'sun/launcher/LauncherHelper.checkAndLoadMain')
+f(3,5430,10,1,'sun/launcher/LauncherHelper.loadMainClass')
+f(4,5430,10,1,'java/lang/Class.forName')
+f(5,5430,10,1,'java/lang/Class.forName')
+f(6,5430,10,1,'java/lang/Class.forName0')
+f(7,5430,10,1,'java/lang/ClassLoader.loadClass')
+f(8,5430,10,1,'jdk/internal/loader/ClassLoaders$AppClassLoader.loadClass')
+f(9,5430,10,1,'jdk/internal/loader/BuiltinClassLoader.loadClass')
+f(10,5430,10,1,'jdk/internal/loader/BuiltinClassLoader.loadClassOrNull')
+f(11,5430,10,1,'jdk/internal/loader/BuiltinClassLoader.findClassOnClassPathOrNull')
+f(12,5430,9,1,'jdk/internal/loader/BuiltinClassLoader.defineClass')
+f(13,5430,9,1,'jdk/internal/loader/URLClassPath$JarLoader$2.getManifest')
+f(14,5430,9,1,'java/util/jar/JavaUtilJarAccessImpl.ensureInitialization')
+f(15,5430,9,1,'java/util/jar/JarFile.ensureInitialization')
+f(16,5430,9,1,'java/util/jar/JarFile.initializeVerifier')
+f(17,5430,9,1,'java/util/jar/JarVerifier.update')
+f(18,5430,9,1,'java/util/jar/JarVerifier.processEntry')
+f(19,5430,6,1,'sun/security/util/SignatureFileVerifier.<init>')
+f(20,5430,2,1,'sun/security/jca/Providers.startJarVerification')
+f(21,5430,2,1,'sun/security/jca/ProviderList.getProvider')
+f(22,5430,2,1,'sun/security/jca/ProviderList.getProviderConfig')
+f(23,5430,2,1,'sun/security/jca/ProviderList.getIndex')
+f(24,5430,2,1,'sun/security/jca/ProviderList.getProvider')
+f(25,5430,2,1,'sun/security/jca/ProviderConfig.getProvider')
+f(26,5430,2,1,'sun/security/provider/Sun.<init>')
+f(27,5430,1,1,'sun/security/provider/SunEntries.<init>')
+f(28,5430,1,1,'sun/security/provider/SunEntries.addWithAlias')
+f(29,5430,1,1,'sun/security/util/SecurityProviderConstants.<clinit>')
+f(30,5430,1,1,'sun/security/util/KnownOIDs.<clinit>')
+f(31,5430,1,0,'sun/security/util/KnownOIDs.register',0,0,1)
+f(32,5430,1,4,'InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code)')
+f(33,5430,1,4,'InterpreterRuntime::resolve_get_put(JavaThread*, Bytecodes::Code)')
+f(34,5430,1,4,'LinkResolver::resolve_field_access(fieldDescriptor&, constantPoolHandle const&, int, methodHandle const&, Bytecodes::Code, JavaThread*)')
+f(35,5430,1,4,'LinkResolver::resolve_field(fieldDescriptor&, LinkInfo const&, Bytecodes::Code, bool, JavaThread*)')
+f(36,5430,1,4,'InstanceKlass::find_field(Symbol*, Symbol*, fieldDescriptor*) const')
+f(37,5430,1,4,'InstanceKlass::find_local_field(Symbol*, Symbol*, fieldDescriptor*) const')
+f(27,5431,1,1,'sun/security/util/SecurityConstants.<clinit>')
+f(28,5431,1,3,'[unknown]')
+f(29,5431,1,3,'open')
+f(30,5431,1,5,'entry_SYSCALL_64_after_hwframe')
+f(31,5431,1,5,'do_syscall_64')
+f(32,5431,1,5,'__x64_sys_openat')
+f(33,5431,1,5,'do_sys_open')
+f(34,5431,1,5,'do_sys_openat2')
+f(35,5431,1,5,'do_filp_open')
+f(36,5431,1,5,'path_openat')
+f(37,5431,1,5,'link_path_walk.part.0')
+f(38,5431,1,5,'inode_permission')
+f(20,5432,4,1,'sun/security/pkcs/PKCS7.<init>')
+f(21,5432,4,1,'sun/security/pkcs/PKCS7.parse')
+f(22,5432,4,1,'sun/security/pkcs/PKCS7.parse')
+f(23,5432,4,1,'sun/security/pkcs/PKCS7.parseSignedData')
+f(24,5432,1,1,'java/security/cert/CertificateFactory.generateCertificate')
+f(25,5432,1,1,'sun/security/provider/X509Factory.engineGenerateCertificate')
+f(26,5432,1,1,'sun/security/provider/X509Factory.cachedGetX509Cert')
+f(27,5432,1,1,'sun/security/x509/X509CertImpl.<init>')
+f(28,5432,1,1,'sun/security/x509/X509CertImpl.parse')
+f(29,5432,1,1,'sun/security/x509/X509CertInfo.<init>')
+f(30,5432,1,1,'sun/security/x509/X509CertInfo.parse')
+f(31,5432,1,1,'sun/security/x509/CertificateValidity.<init>')
+f(32,5432,1,1,'sun/security/util/DerInputStream.getUTCTime')
+f(33,5432,1,1,'sun/security/util/DerValue.getUTCTime')
+f(34,5432,1,0,'sun/security/util/DerValue.getTimeInternal',0,0,1)
+f(35,5432,1,4,'InterpreterRuntime::_new(JavaThread*, ConstantPool*, int)')
+f(36,5432,1,4,'ConstantPool::klass_at_impl(constantPoolHandle const&, int, JavaThread*)')
+f(37,5432,1,4,'SystemDictionary::resolve_or_fail(Symbol*, Handle, Handle, bool, JavaThread*)')
+f(38,5432,1,4,'SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, JavaThread*)')
+f(39,5432,1,4,'SystemDictionary::load_instance_class(Symbol*, Handle, JavaThread*)')
+f(40,5432,1,4,'SystemDictionary::load_instance_class_impl(Symbol*, Handle, JavaThread*)')
+f(41,5432,1,4,'ClassLoader::load_class(Symbol*, bool, JavaThread*)')
+f(42,5432,1,4,'KlassFactory::create_from_stream(ClassFileStream*, Symbol*, ClassLoaderData*, ClassLoadInfo const&, JavaThread*)')
+f(43,5432,1,4,'ClassFileParser::ClassFileParser(ClassFileStream*, Symbol*, ClassLoaderData*, ClassLoadInfo const*, ClassFileParser::Publicity, JavaThread*)')
+f(44,5432,1,4,'ClassFileParser::parse_stream(ClassFileStream const*, JavaThread*) [clone .part.0]')
+f(45,5432,1,4,'ClassFileParser::parse_methods(ClassFileStream const*, bool, bool*, bool*, bool*, JavaThread*)')
+f(46,5432,1,4,'ClassFileParser::parse_method(ClassFileStream const*, bool, ConstantPool const*, bool*, JavaThread*)')
+f(47,5432,1,4,'Method::allocate(ClassLoaderData*, int, AccessFlags, InlineTableSizes*, ConstMethod::MethodType, Symbol*, JavaThread*)')
+f(48,5432,1,4,'ConstMethod::allocate(ClassLoaderData*, int, InlineTableSizes*, ConstMethod::MethodType, JavaThread*)')
+f(49,5432,1,4,'Metaspace::allocate(ClassLoaderData*, unsigned long, MetaspaceObj::Type, JavaThread*)')
+f(50,5432,1,4,'metaspace::MetaspaceArena::allocate(unsigned long)')
+f(24,5433,2,1,'sun/security/pkcs/SignerInfo.<clinit>')
+f(25,5433,2,1,'sun/security/util/DisabledAlgorithmConstraints.jarConstraints')
+f(26,5433,2,1,'sun/security/util/DisabledAlgorithmConstraints$JarHolder.<clinit>')
+f(27,5433,2,1,'sun/security/util/DisabledAlgorithmConstraints.<init>')
+f(28,5433,2,1,'sun/security/util/DisabledAlgorithmConstraints.<init>')
+f(29,5433,2,1,'sun/security/util/DisabledAlgorithmConstraints$Constraints.<init>')
+f(30,5433,1,1,'sun/security/util/CurveDB.<clinit>')
+f(31,5433,1,1,'sun/security/util/CurveDB.add')
+f(32,5433,1,1,'java/security/spec/EllipticCurve.<init>')
+f(33,5433,1,1,'java/security/spec/EllipticCurve.<init>')
+f(34,5433,1,1,'java/security/spec/EllipticCurve.checkValidity')
+f(35,5433,1,1,'java/security/spec/ECFieldFp.getP')
+f(36,5433,1,3,'[unknown]')
+f(37,5433,1,3,'update_get_addr')
+f(30,5434,1,1,'sun/security/util/DisabledAlgorithmConstraints$DenyAfterConstraint.<init>')
+f(31,5434,1,1,'java/time/ZonedDateTime.of')
+f(32,5434,1,0,'java/time/LocalDateTime.<clinit>',0,0,1)
+f(33,5434,1,4,'InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code)')
+f(34,5434,1,4,'InterpreterRuntime::resolve_get_put(JavaThread*, Bytecodes::Code)')
+f(35,5434,1,4,'LinkResolver::resolve_field_access(fieldDescriptor&, constantPoolHandle const&, int, methodHandle const&, Bytecodes::Code, JavaThread*)')
+f(36,5434,1,4,'ConstantPool::klass_ref_at(int, JavaThread*)')
+f(37,5434,1,4,'ConstantPool::klass_at_impl(constantPoolHandle const&, int, JavaThread*)')
+f(38,5434,1,4,'SystemDictionary::resolve_or_fail(Symbol*, Handle, Handle, bool, JavaThread*)')
+f(39,5434,1,4,'SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, JavaThread*)')
+f(40,5434,1,4,'SystemDictionary::load_instance_class(Symbol*, Handle, JavaThread*)')
+f(41,5434,1,4,'SystemDictionary::load_instance_class_impl(Symbol*, Handle, JavaThread*)')
+f(42,5434,1,4,'ClassLoader::load_class(Symbol*, bool, JavaThread*)')
+f(43,5434,1,4,'KlassFactory::create_from_stream(ClassFileStream*, Symbol*, ClassLoaderData*, ClassLoadInfo const&, JavaThread*)')
+f(44,5434,1,4,'ClassFileParser::ClassFileParser(ClassFileStream*, Symbol*, ClassLoaderData*, ClassLoadInfo const*, ClassFileParser::Publicity, JavaThread*)')
+f(45,5434,1,4,'ClassFileParser::parse_stream(ClassFileStream const*, JavaThread*) [clone .part.0]')
+f(46,5434,1,4,'ClassFileParser::parse_constant_pool_entries(ClassFileStream const*, ConstantPool*, int, JavaThread*)')
+f(47,5434,1,4,'SymbolTable::lookup_only(char const*, int, unsigned int&)')
+f(48,5434,1,4,'SymbolTable::do_lookup(char const*, int, unsigned long)')
+f(24,5435,1,1,'sun/security/util/DerInputStream.getBigInteger')
+f(25,5435,1,1,'sun/security/util/DerValue.getBigInteger')
+f(26,5435,1,1,'sun/security/util/DerValue.getBigIntegerInternal')
+f(27,5435,1,0,'java/math/BigInteger.<clinit>',0,0,1)
+f(28,5435,1,4,'InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code)')
+f(29,5435,1,4,'InterpreterRuntime::resolve_get_put(JavaThread*, Bytecodes::Code)')
+f(30,5435,1,4,'LinkResolver::resolve_field_access(fieldDescriptor&, constantPoolHandle const&, int, methodHandle const&, Bytecodes::Code, JavaThread*)')
+f(31,5435,1,4,'LinkResolver::resolve_field(fieldDescriptor&, LinkInfo const&, Bytecodes::Code, bool, JavaThread*)')
+f(32,5435,1,4,'InstanceKlass::find_field(Symbol*, Symbol*, fieldDescriptor*) const')
+f(33,5435,1,4,'InstanceKlass::find_local_field(Symbol*, Symbol*, fieldDescriptor*) const')
+f(34,5435,1,4,'fieldDescriptor::reinitialize(InstanceKlass*, int)')
+f(35,5435,1,4,'InstanceKlass::field(int) const')
+f(19,5436,3,1,'sun/security/util/SignatureFileVerifier.process')
+f(20,5436,3,1,'sun/security/util/SignatureFileVerifier.processImpl')
+f(21,5436,2,1,'sun/security/pkcs/PKCS7.verify')
+f(22,5436,2,1,'sun/security/pkcs/PKCS7.verify')
+f(23,5436,2,1,'sun/security/pkcs/SignerInfo.verify')
+f(24,5436,1,1,'java/security/Signature.verify')
+f(25,5436,1,1,'java/security/Signature$Delegate.engineVerify')
+f(26,5436,1,1,'sun/security/provider/DSA.engineVerify')
+f(27,5436,1,1,'sun/security/provider/DSA.engineVerify')
+f(28,5436,1,1,'sun/security/provider/DSA.generateV')
+f(29,5436,1,1,'java/math/BigInteger.modPow')
+f(30,5436,1,1,'java/math/BigInteger.oddModPow')
+f(31,5436,1,1,'java/math/BigInteger.montgomerySquare')
+f(32,5436,1,1,'java/math/BigInteger.implMontgomerySquare')
+f(33,5436,1,1,'java/math/BigInteger.montReduce')
+f(34,5436,1,0,'java/math/BigInteger.subN',0,0,1)
+f(24,5437,1,1,'sun/security/pkcs/SignerInfo.getCertificate')
+f(25,5437,1,1,'sun/security/pkcs/PKCS7.getCertificate')
+f(26,5437,1,1,'sun/security/x509/X500Name.equals')
+f(27,5437,1,1,'sun/security/x509/X500Name.getRFC2253CanonicalName')
+f(28,5437,1,1,'sun/security/x509/RDN.toRFC2253String')
+f(29,5437,1,1,'sun/security/x509/RDN.toRFC2253StringInternal')
+f(30,5437,1,1,'sun/security/x509/AVA.toRFC2253CanonicalString')
+f(31,5437,1,0,'java/lang/String.<init>',0,0,1)
+f(21,5438,1,1,'sun/security/pkcs/SignerInfo.verifyAlgorithms')
+f(22,5438,1,1,'sun/security/util/DisabledAlgorithmConstraints.permits')
+f(23,5438,1,1,'sun/security/util/DisabledAlgorithmConstraints.permits')
+f(24,5438,1,1,'sun/security/util/DisabledAlgorithmConstraints$Constraints.permits')
+f(25,5438,1,1,'sun/security/util/DisabledAlgorithmConstraints$DenyAfterConstraint.permits')
+f(26,5438,1,1,'java/lang/StringBuilder.append')
+f(27,5438,1,1,'java/lang/String.valueOf')
+f(28,5438,1,1,'java/time/Instant.toString')
+f(29,5438,1,1,'java/time/format/DateTimeFormatter.<clinit>')
+f(30,5438,1,0,'java/time/format/DateTimeFormatterBuilder.appendLiteral',0,0,1)
+f(31,5438,1,4,'InterpreterRuntime::_new(JavaThread*, ConstantPool*, int)')
+f(32,5438,1,4,'ConstantPool::klass_at_impl(constantPoolHandle const&, int, JavaThread*)')
+f(33,5438,1,4,'SystemDictionary::resolve_or_fail(Symbol*, Handle, Handle, bool, JavaThread*)')
+f(34,5438,1,4,'SystemDictionary::resolve_instance_class_or_null(Symbol*, Handle, Handle, JavaThread*)')
+f(35,5438,1,4,'SystemDictionary::load_instance_class(Symbol*, Handle, JavaThread*)')
+f(36,5438,1,4,'SystemDictionary::load_instance_class_impl(Symbol*, Handle, JavaThread*)')
+f(37,5438,1,4,'ClassLoader::load_class(Symbol*, bool, JavaThread*)')
+f(38,5438,1,4,'ClassLoader::search_module_entries(JavaThread*, GrowableArray<ModuleClassPathList*> const*, char const*, char const*)')
+f(39,5438,1,3,'__GI___xstat')
+f(40,5438,1,5,'entry_SYSCALL_64_after_hwframe')
+f(41,5438,1,5,'do_syscall_64')
+f(42,5438,1,5,'__x64_sys_newstat')
+f(43,5438,1,5,'__do_sys_newstat')
+f(44,5438,1,5,'vfs_statx')
+f(45,5438,1,5,'user_path_at_empty')
+f(46,5438,1,5,'filename_lookup')
+f(47,5438,1,5,'path_lookupat.isra.0')
+f(48,5438,1,5,'walk_component')
+f(49,5438,1,5,'lookup_fast')
+f(50,5438,1,5,'__d_lookup_rcu')
+f(12,5439,1,1,'jdk/internal/loader/URLClassPath.getResource')
+f(13,5439,1,0,'jdk/internal/loader/URLClassPath.getLoader',0,0,1)
+f(14,5439,1,4,'InterpreterRuntime::resolve_from_cache(JavaThread*, Bytecodes::Code)')
+f(15,5439,1,4,'InterpreterRuntime::resolve_invoke(JavaThread*, Bytecodes::Code)')
+f(16,5439,1,4,'frame::interpreter_callee_receiver(Symbol*)')
+f(17,5439,1,3,'__memchr_avx2')
+f(1,5440,3,3,'[Program Runner for compress tid=521001]')
+f(2,5440,3,1,'spec/harness/ProgramRunner.run')
+f(3,5440,3,1,'spec/harness/ProgramRunner.runBenchmark')
+f(4,5440,2,1,'spec/harness/ProgramRunner.invokeBmSetupBenchmark')
+f(5,5440,2,1,'java/lang/reflect/Method.invoke')
+f(6,5440,2,1,'jdk/internal/reflect/DirectMethodHandleAccessor.invoke')
+f(7,5440,2,1,'jdk/internal/reflect/DirectMethodHandleAccessor.invokeImpl')
+f(8,5440,2,1,'java/lang/invoke/LambdaForm$MH.0x0000000100081000.invokeExact_MT')
+f(9,5440,2,1,'java/lang/invoke/LambdaForm$MH.0x0000000100142000.invoke')
+f(10,5440,2,1,'java/lang/invoke/LambdaForm$DMH.0x0000000100141000.invokeStatic')
+f(11,5440,2,1,'spec/benchmarks/compress/Main.setupBenchmark')
+f(12,5440,2,0,'spec/benchmarks/compress/Harness.prepareBuffers',0,0,1)
+f(13,5440,1,4,'InterpreterRuntime::multianewarray(JavaThread*, int*)')
+f(14,5440,1,4,'ObjArrayKlass::multi_allocate(int, int*, JavaThread*)')
+f(15,5440,1,4,'TypeArrayKlass::multi_allocate(int, int*, JavaThread*)')
+f(16,5440,1,4,'MemAllocator::allocate() const')
+f(17,5440,1,3,'__memset_avx2_erms')
+f(18,5440,1,5,'asm_exc_page_fault')
+f(19,5440,1,5,'exc_page_fault')
+f(20,5440,1,5,'do_user_addr_fault')
+f(13,5441,1,1,'spec/benchmarks/compress/Harness$Source.<init>')
+f(14,5441,1,0,'spec/benchmarks/compress/Harness$Source.fillBuffer',0,0,1)
+f(15,5441,1,4,'InterpreterRuntime::newarray(JavaThread*, BasicType, int)')
+f(16,5441,1,4,'TypeArrayKlass::allocate_common(int, bool, JavaThread*)')
+f(17,5441,1,4,'MemAllocator::allocate() const')
+f(18,5441,1,3,'__memset_avx2_erms')
+f(19,5441,1,5,'asm_exc_page_fault')
+f(20,5441,1,5,'exc_page_fault')
+f(21,5441,1,5,'do_user_addr_fault')
+f(4,5442,1,1,'spec/harness/ProgramRunner.runIteration')
+f(5,5442,1,1,'spec/harness/ProgramRunner.createBmInstance')
+f(6,5442,1,1,'java/lang/reflect/Constructor.newInstance')
+f(7,5442,1,1,'java/lang/reflect/Constructor.newInstanceWithCaller')
+f(8,5442,1,1,'java/lang/reflect/Constructor.acquireConstructorAccessor')
+f(9,5442,1,1,'jdk/internal/reflect/ReflectionFactory.newConstructorAccessor')
+f(10,5442,1,1,'jdk/internal/reflect/MethodHandleAccessorFactory.newConstructorAccessor')
+f(11,5442,1,1,'java/lang/invoke/MethodHandle.asType')
+f(12,5442,1,1,'java/lang/invoke/MethodHandle.asTypeUncached')
+f(13,5442,1,1,'java/lang/invoke/MethodHandleImpl.makePairwiseConvert')
+f(14,5442,1,1,'java/lang/invoke/MethodHandleImpl.makePairwiseConvert')
+f(15,5442,1,1,'java/lang/invoke/MethodHandleImpl.makePairwiseConvertByEditor')
+f(16,5442,1,1,'java/lang/invoke/LambdaFormEditor.filterArgumentForm')
+f(17,5442,1,1,'java/lang/invoke/LambdaFormEditor.makeArgumentCombinationForm')
+f(18,5442,1,1,'java/lang/invoke/LambdaFormEditor.newSpeciesData')
+f(19,5442,1,1,'java/lang/invoke/BoundMethodHandle$SpeciesData.extendWith')
+f(20,5442,1,1,'java/lang/invoke/ClassSpecializer.findSpecies')
+f(21,5442,1,1,'java/lang/invoke/ClassSpecializer$Factory.loadSpecies')
+f(22,5442,1,1,'java/lang/invoke/ClassSpecializer$Factory.linkSpeciesDataToCode')
+f(23,5442,1,1,'java/lang/invoke/ClassSpecializer$Factory.findFactories')
+f(24,5442,1,1,'java/lang/invoke/ClassSpecializer$Factory.findFactory')
+f(25,5442,1,1,'java/lang/invoke/MethodHandles$Lookup.findStatic')
+f(26,5442,1,1,'java/lang/invoke/MethodHandles$Lookup.resolveOrFail')
+f(27,5442,1,1,'java/lang/invoke/MemberName$Factory.resolveOrFail')
+f(28,5442,1,1,'java/lang/invoke/MemberName$Factory.resolve')
+f(29,5442,1,1,'java/lang/invoke/MemberName.checkForTypeAlias')
+f(30,5442,1,1,'sun/invoke/util/VerifyAccess.isTypeVisible')
+f(31,5442,1,1,'sun/invoke/util/VerifyAccess.isTypeVisible')
+f(32,5442,1,2,'java/lang/Class.getClassLoader',1,0,0)
+f(1,5443,2,3,'[VM Thread tid=520990]')
+f(2,5443,2,3,'start_thread')
+f(3,5443,2,3,'thread_native_entry(Thread*)')
+f(4,5443,2,4,'Thread::call_run()')
+f(5,5443,2,4,'VMThread::run()')
+f(6,5443,2,4,'VMThread::inner_execute(VM_Operation*)')
+f(7,5443,2,4,'VMThread::evaluate_operation(VM_Operation*)')
+f(8,5443,2,4,'VM_Operation::evaluate()')
+f(9,5443,2,4,'VM_GenCollectForAllocation::doit()')
+f(10,5443,2,4,'GenCollectedHeap::satisfy_failed_allocation(unsigned long, bool)')
+f(11,5443,2,4,'GenCollectedHeap::do_collection(bool, bool, unsigned long, bool, GenCollectedHeap::GenerationType)')
+f(12,5443,2,4,'GenCollectedHeap::collect_generation(Generation*, bool, unsigned long, bool, bool, bool)')
+f(13,5443,2,4,'DefNewGeneration::collect(bool, bool, unsigned long, bool)')
+f(14,5443,2,4,'void OopOopIterateDispatch<YoungGenScanClosure>::Table::oop_oop_iterate<InstanceKlass, narrowOop>(YoungGenScanClosure*, oopDesc*, Klass*)')
+f(15,5443,1,4,'DefNewGeneration::copy_to_survivor_space(oopDesc*) [clone .constprop.0]')
+f(15,5444,1,3,'__memmove_avx_unaligned_erms')
+f(16,5444,1,5,'asm_exc_page_fault')
+f(17,5444,1,5,'exc_page_fault')
+f(18,5444,1,5,'do_user_addr_fault')
+f(1,5445,1,3,'[tid=521000]')
+f(2,5445,1,3,'start_thread')
+f(3,5445,1,3,'thread_native_entry(Thread*)')
+f(4,5445,1,4,'Thread::call_run()')
+f(5,5445,1,4,'WatcherThread::run()')
+f(6,5445,1,3,'pthread_mutex_unlock')
+
+search();
+</script></body></html>

@@ -1,0 +1,28 @@
+--- Execution profile ---
+Total samples       : 327714
+unknown_Java        : 291 (0.09%)
+not_walkable_Java   : 7 (0.00%)
+deoptimization      : 3 (0.00%)
+
+       total  percent  samples  top
+  ----------  -------  -------  ---
+122752706765   37.46%   122753  spec.benchmarks.compress.Compressor.compress
+ 47286731726   14.43%    47287  spec.benchmarks.compress.Decompressor.decompress
+ 22896191517    6.99%    22896  spec.benchmarks.compress.Decompressor.getCode
+ 19459995932    5.94%    19460  spec.benchmarks.compress.Decompressor$DeStack.push
+ 19339111856    5.90%    19339  spec.benchmarks.compress.Compressor.output
+ 14231858574    4.34%    14232  spec.benchmarks.compress.CodeTable.of
+ 11712038586    3.57%    11712  spec.benchmarks.compress.InputBuffer.readBytes
+ 10874126734    3.32%    10874  spec.benchmarks.compress.OutputBuffer.writeByte
+ 10768095026    3.29%    10768  spec.benchmarks.compress.InputBuffer.readByte
+  8439134134    2.58%     8439  spec.benchmarks.compress.Compressor$HashTable.of
+  8016053378    2.45%     8016  spec.benchmarks.compress.CodeTable.set
+  7764038953    2.37%     7764  spec.benchmarks.compress.Decompressor$DeStack.pop
+  7406928905    2.26%     7407  spec.benchmarks.compress.Decompressor$SuffixTable.of
+  5200975062    1.59%     5201  spec.benchmarks.compress.Compressor$HashTable.set
+  3300021539    1.01%     3300  spec.benchmarks.compress.Decompressor$DeStack.isEmpty
+  2159015031    0.66%     2159  spec.benchmarks.compress.CodeTable.clear
+  1236005539    0.38%     1236  spec.benchmarks.compress.Decompressor$SuffixTable.set
+   722978188    0.22%      723  updateBytesCRC32
+   553983518    0.17%      554  spec.benchmarks.compress.Compressor$HashTable.clear
+    88999793    0.03%       89  spec.benchmarks.compress.Compressor$HashTable.<init>

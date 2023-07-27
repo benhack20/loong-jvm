@@ -1,0 +1,27 @@
+--- Execution profile ---
+Total samples       : 24714
+GC_active           : 1 (0.00%)
+unknown_Java        : 6 (0.02%)
+
+          ns  percent  samples  top
+  ----------  -------  -------  ---
+ 55700000000   22.54%     5570  spec.benchmarks.compress.Compressor.compress
+ 29700000000   12.02%     2970  spec.benchmarks.compress.Compressor.output
+ 26780000000   10.84%     2678  spec.benchmarks.compress.Compressor$HashTable.of
+ 21550000000    8.72%     2155  spec.benchmarks.compress.CodeTable.of
+ 18200000000    7.36%     1820  spec.benchmarks.compress.Decompressor$SuffixTable.of
+ 18010000000    7.29%     1801  spec.benchmarks.compress.InputBuffer.readByte
+ 15580000000    6.30%     1558  spec.benchmarks.compress.Decompressor.getCode
+ 11930000000    4.83%     1193  spec.benchmarks.compress.Decompressor.decompress
+ 11590000000    4.69%     1159  spec.benchmarks.compress.OutputBuffer.writeByte
+  8630000000    3.49%      863  spec.benchmarks.compress.Decompressor$DeStack.push
+  7870000000    3.18%      787  spec.benchmarks.compress.InputBuffer.readBytes
+  5200000000    2.10%      520  spec.benchmarks.compress.Decompressor$DeStack.isEmpty
+  4970000000    2.01%      497  spec.benchmarks.compress.CodeTable.set
+  3420000000    1.38%      342  updateBytesCRC32
+   300000000    0.12%       30  /opt/sysroot-aarch64/usr/lib/libc.so.6
+   230000000    0.09%       23  zero_blocks
+   170000000    0.07%       17  memset
+   110000000    0.04%       11  arrayof_jint_fill
+   100000000    0.04%       10  __clock_gettime
+    80000000    0.03%        8  /opt/sysroot-aarch64/usr/lib/ld-linux-aarch64.so.1

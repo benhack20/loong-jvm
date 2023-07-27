@@ -1,0 +1,27 @@
+--- Execution profile ---
+Total samples       : 21136
+unknown_Java        : 1 (0.00%)
+deoptimization      : 6 (0.03%)
+
+          ns  percent  samples  top
+  ----------  -------  -------  ---
+ 52390000000   24.79%     5239  spec.benchmarks.compress.Compressor.compress
+ 21050000000    9.96%     2105  spec.benchmarks.compress.Compressor.output
+ 20170000000    9.54%     2017  spec.benchmarks.compress.InputBuffer.readByte
+ 20110000000    9.51%     2011  spec.benchmarks.compress.Compressor$HashTable.of
+ 13870000000    6.56%     1387  spec.benchmarks.compress.Decompressor$DeStack.push
+ 12840000000    6.07%     1284  spec.benchmarks.compress.Decompressor.getCode
+ 11130000000    5.27%     1113  spec.benchmarks.compress.Decompressor.decompress
+  7840000000    3.71%      784  spec.benchmarks.compress.Decompressor$DeStack.isEmpty
+  7560000000    3.58%      756  spec.benchmarks.compress.CodeTable.of
+  6590000000    3.12%      659  spec.benchmarks.compress.OutputBuffer.writeByte
+  6370000000    3.01%      637  spec.benchmarks.compress.Decompressor$DeStack.pop
+  5900000000    2.79%      590  spec.benchmarks.compress.InputBuffer.readBytes
+  4760000000    2.25%      476  /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+  3890000000    1.84%      389  spec.benchmarks.compress.CodeTable.set
+  3500000000    1.66%      350  spec.benchmarks.compress.Decompressor$SuffixTable.of
+  2610000000    1.23%      261  spec.benchmarks.compress.CodeTable.clear
+   770000000    0.36%       77  spec.benchmarks.compress.Decompressor$SuffixTable.set
+   190000000    0.09%       19  spec.benchmarks.compress.Compressor$HashTable.clear
+   160000000    0.08%       16  spec.benchmarks.compress.CodeTable.<init>
+   140000000    0.07%       14  __tls_get_addr
